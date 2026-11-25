@@ -34,7 +34,7 @@ export default function Tree({archive, language, t, onMember}: {
   const rows = useMemo(() => generations(members,archive.parents), [members,archive.parents]);
   const query = search.trim().toLocaleLowerCase();
   const matches = new Set(members.filter(member =>
-    [member.name_en,member.name_ckb,member.birth_year].some(value => String(value ?? "").toLocaleLowerCase().includes(query))
+    [member.name_en,member.name_ckb].some(value => String(value ?? "").toLocaleLowerCase().includes(query))
   ).map(member => member.id));
   const visible = new Set<string>();
   const matchingAncestors = new Set(matches);
@@ -99,7 +99,7 @@ export default function Tree({archive, language, t, onMember}: {
             return <div key={member.id} className="tree-node" style={{left:point.x,top:point.y}}>
               <button className={`person ${query ? matches.has(member.id) ? "match" : "dim" : ""}`} onClick={() => onMember(member)}>
                 {member.photo_path ? <img className="initial" src={photoUrl(member.photo_path)} alt="" loading="lazy" /> : <span className="initial" aria-hidden="true">{Array.from(name)[0]}</span>}
-                <span><strong>{name}</strong><small>{[member.birth_year, t(member.gender)].filter(Boolean).join(" · ")}</small></span>
+                <span><strong>{name}</strong>{member.gender !== "unspecified" && <small>{t(member.gender)}</small>}</span>
               </button>
               {children.length > 0 && <div className="branch-control"><button className="branch-toggle" aria-expanded={expanded}
                 disabled={revealed} aria-label={t(expanded ? "hide" : "show")+" "+name} onClick={() => toggle(member.id)}>{expanded ? "−" : "+"}</button></div>}

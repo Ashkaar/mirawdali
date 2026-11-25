@@ -9,6 +9,11 @@ import Tree, { memberName, photoUrl } from "./tree";
 
 const views = ["tree","gallery","blog"] as const;
 const categories = ["memories","history","news"] as const;
+const tabIcons: Record<string, ReactNode> = {
+  tree: <><circle cx="12" cy="5" r="2.5"/><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M12 7.5V12M6 16.5V12h12v4.5"/></>,
+  gallery: <><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5.5-5 4 3.5 3-2.5L21 18"/></>,
+  blog: <><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h7"/></>,
+};
 type View = typeof views[number];
 type AuthMode = "login" | "signup" | "reset" | "newPassword";
 type Panel = { type: "account" | "privacy" | "submissions" } |
@@ -207,13 +212,14 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
   }
 
   const currentPanel = panel ? renderPanel(panel) : null;
+  const navigation = (className: string) => <nav className={className} aria-label={language === "en" ? "Main navigation" : "ڕێنیشاندەری سەرەکی"}>
+    {views.map(tab => <button key={tab} onClick={() => {setView(tab);location.hash = tab;}} aria-current={tab === view ? "page" : undefined}><svg className="tab-icon" viewBox="0 0 24 24" aria-hidden="true">{tabIcons[tab]}</svg><span>{t(tab)}</span></button>)}
+  </nav>;
   return <>
     <header className="masthead">
       <div className="top">
         <a className="brand" href="#tree"><span className="crest" aria-hidden="true">M</span>{t("title")}</a>
-        <nav className="tabs" aria-label={language === "en" ? "Main navigation" : "ڕێنیشاندەری سەرەکی"}>
-          {views.map(tab => <button key={tab} onClick={() => {setView(tab);location.hash = tab;}} aria-current={tab === view ? "page" : undefined}>{t(tab)}</button>)}
-        </nav>
+        {navigation("tabs")}
         <div className="actions">
           <button className="icon" onClick={switchLanguage} lang={language === "en" ? "ckb" : "en"}>{language === "en" ? "کوردی" : "English"}</button>
           <button className="icon" id="theme" aria-label={t(theme === "dark" ? "light" : "dark")} onClick={switchTheme}>{theme === "dark" ? "☀" : "☾"}</button>
@@ -233,8 +239,8 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
           {view === "blog" && <div className="categories" role="group" aria-label={t("filter")}>
             {(["all",...categories] as const).map(category => <button key={category} className="outline" aria-pressed={category === filter} onClick={() => setFilter(category)}>{t(category)}</button>)}
           </div>}
-          <div className="content" aria-live="polite">{published.length ? published.map(entry => entry.kind === "photo" ?
-            <button key={entry.id} className="tile" onClick={() => open({type:"entry",entry})}>
+          <div className={"content"+(view === "gallery" ? " photo-grid" : "")} aria-live="polite">{published.length ? published.map(entry => entry.kind === "photo" ?
+            <button key={entry.id} className="tile photo-tile" onClick={() => open({type:"entry",entry})}>
               {entry.image_path && <img src={photoUrl(entry.image_path)} alt="" loading="lazy" />}
               <span className="tile-copy"><strong>{entry.title}</strong></span>
             </button> : <button key={entry.id} className="tile post" onClick={() => open({type:"entry",entry})}>
@@ -243,6 +249,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
             </button>) : <p className="empty-posts">{t(view === "blog" ? "noPosts" : "noPhotos")}</p>}</div>
         </>}
     </section></main>
+    {navigation("tabs bottom-tabs")}
     <footer><span>Mirawdali · میراودەلی</span><button className="plain" onClick={() => open({type:"privacy"})}>{t("privacy")}</button></footer>
     {currentPanel && <Dialog title={currentPanel.title} close={() => open(null)} t={t}>
       {currentPanel.content}
