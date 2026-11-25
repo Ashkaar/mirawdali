@@ -7,9 +7,10 @@ import { authAction, submitContribution, updateProfile } from "@/app/actions";
 import { translate, type Language, type Translate } from "./copy";
 import Tree, { memberName, photoUrl } from "./tree";
 
-const views = ["tree","gallery","blog"] as const;
+const views = ["home","tree","gallery","blog"] as const;
 const categories = ["memories","history","news"] as const;
 const tabIcons: Record<string, ReactNode> = {
+  home: <><path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h4.5v-5.5h3V20H18V9.5"/></>,
   tree: <><circle cx="12" cy="5" r="2.5"/><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M12 7.5V12M6 16.5V12h12v4.5"/></>,
   gallery: <><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5.5-5 4 3.5 3-2.5L21 18"/></>,
   blog: <><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h7"/></>,
@@ -65,7 +66,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
   const router = useRouter();
   const [language,setLanguage] = useState<Language>("en");
   const [theme,setTheme] = useState("light");
-  const [view,setView] = useState<View>("tree");
+  const [view,setView] = useState<View>("home");
   const [filter,setFilter] = useState<Category | "all">("all");
   const [panel,setPanel] = useState<Panel | null>(null);
   const [message,setMessage] = useState<Result>({});
@@ -82,7 +83,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
     setTheme(doc.dataset.theme === "dark" ? "dark" : "light");
     const syncView = () => {
       const current = location.hash.slice(1);
-      setView(views.includes(current as View) ? current as View : "tree");
+      setView(views.includes(current as View) ? current as View : "home");
     };
     syncView();
     window.addEventListener("hashchange",syncView);
@@ -153,7 +154,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
     setToast(result.success ?? "");
   };
 
-  const currentKind = {tree:"suggestion",gallery:"photo",blog:"post"}[view] as Kind;
+  const currentKind = ({tree:"suggestion",gallery:"photo",blog:"post"} as Record<string, Kind>)[view];
   const actionLabel = {suggestion:"suggest",photo:"submitPhoto",post:"write"};
   const published = archive.published.filter(item => view === "gallery" ? item.kind === "photo" :
     item.kind === "post" && (filter === "all" || item.category === filter));
@@ -251,8 +252,36 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
   }
 
   const currentPanel = panel ? renderPanel(panel) : null;
+  function go(tab: View) {
+    setView(tab);
+    location.hash = tab === "home" ? "" : tab;
+    window.scrollTo({top: 0});
+  }
+  const tile = (entry: Contribution) => entry.kind === "photo" ?
+    <button key={entry.id} className="tile photo-tile" onClick={() => open({type:"entry",entry})}>
+      {entry.image_path && <img src={photoUrl(entry.image_path)} alt="" loading="lazy" />}
+      <span className="tile-copy"><strong>{entry.title}</strong></span>
+    </button> : <button key={entry.id} className="tile post" onClick={() => open({type:"entry",entry})}>
+      {entry.category && <span className="category">{t(entry.category)}</span>}<strong>{entry.title}</strong>
+      <p>{entry.body.length > 180 ? entry.body.slice(0,180)+"…" : entry.body}</p>
+    </button>;
+  const photos = archive.published.filter(item => item.kind === "photo");
+  const posts = archive.published.filter(item => item.kind === "post");
+  const home = <>
+    <div className="bar"><div><h2>{t("welcome")}</h2><p>{t("homeIntro")}</p></div></div>
+    <div className="home-stats">
+      {([["tree","membersCount",archive.members.length],["gallery","photosCount",photos.length],["blog","postsCount",posts.length]] as const).map(([tab,label,count]) =>
+        <button key={tab} className="stat" onClick={() => go(tab)}>
+          <svg className="stat-icon" viewBox="0 0 24 24" aria-hidden="true">{tabIcons[tab]}</svg><b>{count}</b><span>{t(label)}</span>
+        </button>)}
+    </div>
+    <div className="home-head"><h3>{t("latestPhotos")}</h3>{photos.length > 0 && <button className="plain" onClick={() => go("gallery")}>{t("seeAll")}</button>}</div>
+    <div className="content photo-grid home-photos">{photos.length ? photos.slice(0,4).map(tile) : <p className="empty-posts">{t("noPhotos")}</p>}</div>
+    <div className="home-head"><h3>{t("latestPosts")}</h3>{posts.length > 0 && <button className="plain" onClick={() => go("blog")}>{t("seeAll")}</button>}</div>
+    <div className="content">{posts.length ? posts.slice(0,3).map(tile) : <p className="empty-posts">{t("noPosts")}</p>}</div>
+  </>;
   const navigation = (className: string) => <nav className={className} aria-label={language === "en" ? "Main navigation" : "ڕێنیشاندەری سەرەکی"}>
-    {views.map(tab => <button key={tab} onClick={() => {setView(tab);location.hash = tab;}} aria-current={tab === view ? "page" : undefined}><svg className="tab-icon" viewBox="0 0 24 24" aria-hidden="true">{tabIcons[tab]}</svg><span>{t(tab)}</span></button>)}
+    {views.map(tab => <button key={tab} onClick={() => go(tab)} aria-current={tab === view ? "page" : undefined}><svg className="tab-icon" viewBox="0 0 24 24" aria-hidden="true">{tabIcons[tab]}</svg><span>{t(tab)}</span></button>)}
   </nav>;
   return <>
     <header className="masthead">
@@ -270,26 +299,19 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
         </div>
       </div>
       <section className="intro"><div><p className="eyebrow">{t("archive")}</p><h1>{t("title")}</h1><p className="credit">{t("developed")} <strong>Ashkar Rashid</strong></p></div>
-        {archive.configured && !archive.failed && canBrowse && <button className="primary" onClick={() => contribute(currentKind)}>{t(actionLabel[currentKind])}</button>}
+        {archive.configured && !archive.failed && canBrowse && currentKind && <button className="primary" onClick={() => contribute(currentKind)}>{t(actionLabel[currentKind])}</button>}
       </section>
     </header>
     <main><section className="frame">
       {!archive.configured || archive.failed || !canBrowse ? <div className="bar"><div><h2>{t(view === "tree" ? "familyTree" : view)}</h2>
         <p>{t(!archive.configured ? "setup" : archive.failed ? "loadError" : "privateArchive")}</p></div>
         {archive.configured && !archive.failed && <button className="primary" onClick={() => open({type:"account"})}>{t("login")}</button>}</div> :
-        view === "tree" ? <Tree archive={archive} language={language} t={t} onMember={member => open({type:"member",member})} /> : <>
+        view === "home" ? home : view === "tree" ? <Tree archive={archive} language={language} t={t} onMember={member => open({type:"member",member})} /> : <>
           <div className="bar"><div><h2>{t(view)}</h2><p>{t(view === "blog" ? "blogHint" : "galleryHint")}</p></div></div>
           {view === "blog" && <div className="categories" role="group" aria-label={t("filter")}>
             {(["all",...categories] as const).map(category => <button key={category} className="outline" aria-pressed={category === filter} onClick={() => setFilter(category)}>{t(category)}</button>)}
           </div>}
-          <div className={"content"+(view === "gallery" ? " photo-grid" : "")} aria-live="polite">{published.length ? published.map(entry => entry.kind === "photo" ?
-            <button key={entry.id} className="tile photo-tile" onClick={() => open({type:"entry",entry})}>
-              {entry.image_path && <img src={photoUrl(entry.image_path)} alt="" loading="lazy" />}
-              <span className="tile-copy"><strong>{entry.title}</strong></span>
-            </button> : <button key={entry.id} className="tile post" onClick={() => open({type:"entry",entry})}>
-              {entry.category && <span className="category">{t(entry.category)}</span>}<strong>{entry.title}</strong>
-              <p>{entry.body.length > 180 ? entry.body.slice(0,180)+"…" : entry.body}</p>
-            </button>) : <p className="empty-posts">{t(view === "blog" ? "noPosts" : "noPhotos")}</p>}</div>
+          <div className={"content"+(view === "gallery" ? " photo-grid" : "")} aria-live="polite">{published.length ? published.map(tile) : <p className="empty-posts">{t(view === "blog" ? "noPosts" : "noPhotos")}</p>}</div>
         </>}
     </section></main>
     {navigation("tabs bottom-tabs")}
