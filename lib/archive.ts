@@ -28,7 +28,9 @@ export async function loadArchive(): Promise<Archive> {
     const session = await db.auth.getClaims();
     const signedIn = Boolean(session.data?.claims.sub);
     const fields = "id,title,body,kind,status,category,image_path,member_id,created_at";
-    const [visibility, roles, members, parents, partners, published, mine] = await Promise.all([
+    // The account itself, not the device's sign-in token, so a name or photo changed on another device shows at once.
+    const [account, visibility, roles, members, parents, partners, published, mine] = await Promise.all([
+      signedIn ? db.auth.getUser() : null,
       db.rpc("archive_is_public"),
       signedIn ? db.rpc("my_archive_roles") : { data: null, error: null },
       db.from("members").select("*").order("id"),
@@ -39,7 +41,7 @@ export async function loadArchive(): Promise<Archive> {
     ]);
     const parsedRoles = parseRoles(roles.data);
     return {
-      ...empty, signedIn, roles: parsedRoles, profile: signedIn ? profileFrom(session.data!.claims as Record<string, unknown>) : null, admin: hasAnyRole(parsedRoles), publicRead: visibility.data === true,
+      ...empty, signedIn, roles: parsedRoles, profile: signedIn ? profileFrom(account?.data.user ? { email: account.data.user.email, user_metadata: account.data.user.user_metadata } : session.data!.claims as Record<string, unknown>) : null, admin: hasAnyRole(parsedRoles), publicRead: visibility.data === true,
       failed: [visibility,roles,members,parents,partners,published,mine].some(result => Boolean(result.error)),
       members: members.data ?? [], parents: parents.data ?? [], partners: partners.data ?? [],
       published: published.data ?? [], mine: mine.data ?? [],

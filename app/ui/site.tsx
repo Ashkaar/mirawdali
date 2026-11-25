@@ -36,6 +36,16 @@ function Dialog({ title, close, children, t }: { title: string; close: () => voi
   </dialog>;
 }
 
+/** Round profile photo, falling back to the first initial if there is none or it fails to load. */
+function Avatar({ profile, large }: { profile: Profile | null; large?: boolean }) {
+  const [failed, setFailed] = useState(false);
+  const className = "avatar" + (large ? " large" : "");
+  useEffect(() => setFailed(false), [profile?.avatar]);
+  return profile?.avatar && !failed
+    ? <img className={className} src={profile.avatar} alt="" referrerPolicy="no-referrer" onError={() => setFailed(true)} />
+    : <span className={className} aria-hidden="true">{Array.from(profile?.firstName ?? "?")[0]?.toUpperCase()}</span>;
+}
+
 /** Signed-in user's first name and round photo, opening a menu of account options. */
 function AccountMenu({ profile, children, label }: { profile: Profile; children: ReactNode; label: string }) {
   const [open, setOpen] = useState(false);
@@ -54,7 +64,7 @@ function AccountMenu({ profile, children, label }: { profile: Profile; children:
   }, [open]);
   return <div className="account-menu" ref={root}>
     <button className="profile-button" aria-haspopup="menu" aria-expanded={open} aria-label={label + " · " + profile.firstName} onClick={() => setOpen(!open)}>
-      {profile.avatar ? <img className="avatar" src={profile.avatar} alt="" referrerPolicy="no-referrer" /> : <span className="avatar" aria-hidden="true">{Array.from(profile.firstName)[0]?.toUpperCase()}</span>}
+      <Avatar profile={profile} />
       <span className="first-name">{profile.firstName}</span>
       <svg className="chevron" viewBox="0 0 12 12" aria-hidden="true"><path d="m3 4.5 3 3 3-3"/></svg>
     </button>
@@ -189,7 +199,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
       return {title:t("profile"),content:<form onSubmit={event => perform(event,updateProfile,closeWithToast)}>
         <label>{t("firstName")}<input name="first_name" dir="auto" maxLength={40} required defaultValue={profile?.firstName ?? ""} autoComplete="given-name" /></label>
         <PhotoCrop name="photo" label={t("profilePhoto")} hint={t("photoLimit")} round t={t}
-          current={profile?.avatar ? <img className="avatar large" src={profile.avatar} alt="" referrerPolicy="no-referrer" /> : <span className="avatar large" aria-hidden="true">{Array.from(profile?.firstName ?? "?")[0]?.toUpperCase()}</span>} />
+          current={<Avatar profile={profile ?? null} large />} />
         {profile?.avatarPath && <label className="check"><input type="checkbox" name="remove_photo" value="true" />{t("removePhoto")}</label>}
         <button className="primary" disabled={busy}>{t("save")}</button>
       </form>};
