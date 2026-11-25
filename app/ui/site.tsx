@@ -7,6 +7,7 @@ import { authAction, submitContribution, updateProfile } from "@/app/actions";
 import { translate, type Language, type Translate } from "./copy";
 import Tree, { memberName, photoUrl } from "./tree";
 import Preferences from "./preferences";
+import PhotoCrop from "./photo-crop";
 
 const views = ["home","tree","gallery","blog"] as const;
 const categories = ["memories","history","news"] as const;
@@ -186,11 +187,9 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
     if (active.type === "profile") {
       const profile = archive.profile;
       return {title:t("profile"),content:<form onSubmit={event => perform(event,updateProfile,closeWithToast)}>
-        <div className="profile-preview">
-          {profile?.avatar ? <img className="avatar large" src={profile.avatar} alt="" referrerPolicy="no-referrer" /> : <span className="avatar large" aria-hidden="true">{Array.from(profile?.firstName ?? "?")[0]?.toUpperCase()}</span>}
-        </div>
         <label>{t("firstName")}<input name="first_name" dir="auto" maxLength={40} required defaultValue={profile?.firstName ?? ""} autoComplete="given-name" /></label>
-        <label>{t("profilePhoto")}<input name="photo" type="file" accept="image/jpeg,image/png,image/webp" /><small>{t("photoLimit")}</small></label>
+        <PhotoCrop name="photo" label={t("profilePhoto")} hint={t("photoLimit")} round t={t}
+          current={profile?.avatar ? <img className="avatar large" src={profile.avatar} alt="" referrerPolicy="no-referrer" /> : <span className="avatar large" aria-hidden="true">{Array.from(profile?.firstName ?? "?")[0]?.toUpperCase()}</span>} />
         {profile?.avatarPath && <label className="check"><input type="checkbox" name="remove_photo" value="true" />{t("removePhoto")}</label>}
         <button className="primary" disabled={busy}>{t("save")}</button>
       </form>};

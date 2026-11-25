@@ -63,3 +63,6 @@ Object.assign(production.ckb, {profile:"پرۆفایل", firstName:"ناوی ی�
 
 Object.assign(production.en, {home:"Home", welcome:"Welcome to the family archive", homeIntro:"Explore the family tree, look through old photographs and read stories shared by relatives.", membersCount:"Family members", photosCount:"Photos", postsCount:"Stories", latestPhotos:"Latest photos", latestPosts:"Latest stories", seeAll:"See all"});
 Object.assign(production.ckb, {home:"سەرەکی", welcome:"بەخێربێن بۆ ئەرشیفی بنەماڵە", homeIntro:"شەجەرەی خێزان ببینە، سەیری وێنە کۆنەکان بکە و ئەو چیرۆکانە بخوێنەوە کە خزمەکان هاوبەشیان کردووە.", membersCount:"ئەندامانی بنەماڵە", photosCount:"وێنەکان", postsCount:"چیرۆکەکان", latestPhotos:"دوایین وێنەکان", latestPosts:"دوایین چیرۆکەکان", seeAll:"هەمووی ببینە"});
+
+Object.assign(production.en, {add:"Add", remove:"Remove", zoom:"Zoom", zoomIn:"Zoom in", zoomOut:"Zoom out", cropHint:"Drag to move the photo. Pinch, scroll or use the slider to zoom.", cancelPhoto:"Don't use this photo"});
+Object.assign(production.ckb, {add:"زیادکردن", remove:"لابردن", zoom:"گەورەکردن", zoomIn:"گەورەکردن", zoomOut:"بچووککردنەوە", cropHint:"وێنەکە ڕابکێشە بۆ جووڵاندنی. بۆ گەورە و بچووککردن دوو پەنجە یان سلایدەرەکە بەکاربهێنە.", cancelPhoto:"ئەم وێنەیە بەکار مەهێنە"});

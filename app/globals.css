@@ -462,3 +462,34 @@ a.outline { color: inherit; }
   .admin-table .row-actions { flex-direction: column; margin: 0; }
   .who { min-width: 0; }
 }
+
+/* People picker: chosen relatives as removable chips */
+.people-picker { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; min-width: 0; }
+.people-picker legend { padding: 0; margin-bottom: 8px; }
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 4px 3px 12px; border-radius: 20px; background: var(--soft); border: 1px solid var(--line); font-size: .9rem; max-width: 100%; }
+[dir="rtl"] .chip { padding: 3px 12px 3px 4px; }
+.chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip button { width: 28px; height: 28px; flex: 0 0 28px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 1.2rem; line-height: 1; }
+.chip button:hover { background: var(--panel); color: var(--accent); }
+
+/* Photo framing */
+.photo-crop { display: grid; gap: 10px; }
+.photo-crop label { display: grid; gap: 8px; }
+.crop { display: grid; justify-items: center; gap: 8px; }
+.crop-view {
+  position: relative; width: 260px; max-width: 100%; aspect-ratio: 1; overflow: hidden; border-radius: 16px;
+  background: var(--soft); touch-action: none; cursor: grab; user-select: none; box-shadow: 0 0 0 1px var(--line);
+}
+.crop-view:active { cursor: grabbing; }
+.crop-view.round { border-radius: 50%; }
+.crop-view img { position: absolute; top: 0; left: 0; max-width: none; transform-origin: 0 0; pointer-events: none; }
+.crop-controls { display: flex; align-items: center; gap: 10px; width: min(260px, 100%); }
+.crop-controls input[type="range"] { flex: 1; accent-color: var(--accent); padding: 0; border: 0; background: transparent; }
+.crop-controls .icon { width: 36px; height: 36px; padding: 0; font-size: 1.1rem; border-radius: 50%; }
+.crop .hint { text-align: center; margin: 0; }
+.crop-current { display: flex; justify-content: center; }
+.member-photo { width: 120px; height: 120px; object-fit: cover; border-radius: 16px; }
+/* Keep wide controls (long names in dropdowns) from stretching dialogs */
+.dialog-body form > *, .dialog-body label { min-width: 0; }
+.dialog-body input:not([type=checkbox]):not([type=range]), .dialog-body select, .dialog-body textarea { width: 100%; max-width: 100%; }

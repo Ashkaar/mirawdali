@@ -7,6 +7,8 @@ import { categoryKeys, sectionKeys, type Kind, type Member, type Section, type S
 import { translate, type Language, type Translate } from "@/app/ui/copy";
 import { memberName, photoUrl } from "@/app/ui/tree";
 import Preferences from "@/app/ui/preferences";
+import PeoplePicker from "@/app/ui/people-picker";
+import PhotoCrop from "@/app/ui/photo-crop";
 import {
   deleteEntry, deleteMember, deleteUser, markSuggestionDone, publishEntry, saveMember, setEntryStatus,
   setUserBlocked, setUserSections, setVisibility, updateEntry,
@@ -292,9 +294,7 @@ function MemberForm({ data, t, language, busy, perform, member, suggestion }: Sh
   const parents = data.parents.filter(edge => edge.child_id === member?.id).map(edge => edge.parent_id);
   const partners = data.partners.filter(edge => edge.first_id === member?.id || edge.second_id === member?.id)
     .map(edge => edge.first_id === member?.id ? edge.second_id : edge.first_id);
-  const options = data.members.filter(item => item.id !== member?.id)
-    .sort((a, b) => memberName(a, language).localeCompare(memberName(b, language)))
-    .map(item => <option key={item.id} value={item.id}>{memberName(item, language)}{item.birth_year ? " (" + item.birth_year + ")" : ""}</option>);
+  const others = data.members.filter(item => item.id !== member?.id);
   return <form key={member?.id ?? "new"} onSubmit={event => perform(event, saveMember)}>
     <input type="hidden" name="id" value={member?.id ?? ""} />
     {suggestion && <div className="review-item"><input type="hidden" name="suggestion" value={suggestion.id} /><strong>{suggestion.title}</strong><p className="entry-body">{suggestion.body}</p></div>}
@@ -305,14 +305,11 @@ function MemberForm({ data, t, language, busy, perform, member, suggestion }: Sh
       <label>{t("birthYear")}<input name="birth_year" type="number" min={1} max={9999} defaultValue={member?.birth_year ?? ""} /></label>
       <label>{t("deathYear")}<input name="death_year" type="number" min={1} max={9999} defaultValue={member?.death_year ?? ""} /></label>
     </div>
-    {member?.photo_path && <img className="gallery-image" src={photoUrl(member.photo_path)} alt="" />}
-    <label>{t("addPhoto")}<input name="photo" type="file" accept="image/jpeg,image/png,image/webp" /><small>{t("photoLimit")}</small></label>
-    {options.length ? <>
-      <p className="hint">{t("relationshipsHint")}</p>
-      <div className="form-row">
-        <label>{t("parent")}<select multiple name="parents" defaultValue={parents}>{options}</select></label>
-        <label>{t("partnerField")}<select multiple name="partners" defaultValue={partners}>{options}</select></label>
-      </div>
+    <PhotoCrop name="photo" label={t("addPhoto")} hint={t("photoLimit")} t={t}
+      current={member?.photo_path ? <img className="member-photo" src={photoUrl(member.photo_path)} alt="" /> : undefined} />
+    {others.length ? <>
+      <PeoplePicker name="parents" label={t("parent")} options={others} initial={parents} language={language} t={t} />
+      <PeoplePicker name="partners" label={t("partnerField")} options={others} initial={partners} language={language} t={t} />
     </> : <p className="hint">{t("noRelatives")}</p>}
     <div className="choices"><button className="primary" disabled={busy}>{t("save")}</button></div>
   </form>;
