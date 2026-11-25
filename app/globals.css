@@ -493,3 +493,6 @@ a.outline { color: inherit; }
 /* Keep wide controls (long names in dropdowns) from stretching dialogs */
 .dialog-body form > *, .dialog-body label { min-width: 0; }
 .dialog-body input:not([type=checkbox]):not([type=range]), .dialog-body select, .dialog-body textarea { width: 100%; max-width: 100%; }
+/* An opened photo shows whole: fitted inside the dialog, never cropped */
+.dialog-body .gallery-image { width: 100%; height: auto; max-height: 70vh; object-fit: contain; border-radius: 10px; }
+.dialog-body .gallery-image + * { margin-top: 12px; }
