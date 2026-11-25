@@ -22,6 +22,10 @@
   --glass-selected: #812f4b;
   --glass-selected-ink: #fff8fb;
   --glass-hover: #812f4b19;
+  --lg-top: #fffaf8b8;
+  --lg-bottom: #f8ecee80;
+  --lg-rim: #ffffffd9;
+  --lg-sheen: #ffffffcc;
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
@@ -47,6 +51,10 @@
   --glass-selected: #ebb1c7;
   --glass-selected-ink: #371b29;
   --glass-hover: #ebb1c723;
+  --lg-top: #3b2f3bc7;
+  --lg-bottom: #231c258c;
+  --lg-rim: #ffffff2e;
+  --lg-sheen: #ffffff24;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 1rem/1.5 system-ui, sans-serif; }
@@ -332,14 +340,29 @@ a.outline { color: inherit; }
 .bottom-tabs { display: none !important; }
 @media(max-width: 700px) {
   .masthead .tabs { display: none; }
-  body:has(.bottom-tabs) { padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
+  body:has(.bottom-tabs) { padding-bottom: calc(74px + env(safe-area-inset-bottom)); }
   .bottom-tabs {
-    display: flex !important; position: fixed; z-index: 4; inset-inline: 12px; bottom: calc(10px + env(safe-area-inset-bottom));
-    padding: 5px; border-radius: 22px; justify-content: space-around; color: var(--hero-ink);
+    display: flex !important; position: fixed; z-index: 4; inset-inline: 0; bottom: 0;
+    padding: 7px 10px calc(7px + env(safe-area-inset-bottom)); gap: 4px;
+    border-radius: 26px 26px 0 0; border: 1px solid var(--lg-rim); border-bottom: 0;
+    justify-content: space-around; color: var(--hero-ink); isolation: isolate;
+    background: linear-gradient(180deg, var(--lg-top), var(--lg-bottom));
+    backdrop-filter: blur(26px) saturate(190%) brightness(1.04);
+    -webkit-backdrop-filter: blur(26px) saturate(190%) brightness(1.04);
+    box-shadow: inset 0 1px 0 var(--lg-rim), inset 0 12px 18px -14px var(--lg-sheen), 0 -10px 34px var(--glass-shadow);
   }
-  .bottom-tabs button { flex: 1; display: grid; justify-items: center; gap: 2px; padding: 6px 4px; border-radius: 17px; font-size: .75rem; }
+  /* Specular highlight across the top edge */
+  .bottom-tabs::before {
+    content: ""; position: absolute; z-index: -1; inset: 0 0 auto; height: 60%; border-radius: inherit; pointer-events: none;
+    background: radial-gradient(120% 90% at 50% -30%, var(--lg-sheen), transparent 70%);
+  }
+  .bottom-tabs button { flex: 1; display: grid; justify-items: center; gap: 2px; padding: 7px 4px; border-radius: 18px; font-size: .75rem; }
+  .bottom-tabs button[aria-current="page"] {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--glass-selected) 78%, #fff 22%), var(--glass-selected));
+    box-shadow: inset 0 1px 0 #ffffff59, inset 0 -1px 0 #0000001f, 0 4px 14px var(--glass-shadow);
+  }
   .tab-icon { display: block; }
-  .toast { inset-block-end: calc(88px + env(safe-area-inset-bottom)); }
+  .toast { inset-block-end: calc(84px + env(safe-area-inset-bottom)); }
   .photo-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; padding: 8px; }
   .photo-grid .tile-copy { padding: 8px 9px 9px; font-size: .8125rem; }
 }
