@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import type { Archive, Category, Contribution, Kind, Member } from "@/lib/archive";
-import { authAction, submitContribution } from "@/app/actions";
+import type { Archive, Category, Contribution, Kind, Member, Profile } from "@/lib/archive";
+import { authAction, submitContribution, updateProfile } from "@/app/actions";
 import { translate, type Language, type Translate } from "./copy";
 import Tree, { memberName, photoUrl } from "./tree";
 
@@ -16,7 +16,7 @@ const tabIcons: Record<string, ReactNode> = {
 };
 type View = typeof views[number];
 type AuthMode = "login" | "signup" | "reset" | "newPassword";
-type Panel = { type: "account" | "privacy" | "submissions" } |
+type Panel = { type: "account" | "privacy" | "submissions" | "profile" } |
   { type: "auth"; mode: AuthMode } | { type: "member"; member: Member } |
   { type: "entry"; entry: Contribution } |
   { type: "contribute"; kind: Kind; member?: Member };
@@ -31,6 +31,32 @@ function Dialog({ title, close, children, t }: { title: string; close: () => voi
     <div className="dialog-head"><h2 id="dialog-title">{title}</h2><button className="icon" onClick={close}>{t("close")}</button></div>
     <div className="dialog-body">{children}</div>
   </dialog>;
+}
+
+/** Signed-in user's first name and round photo, opening a menu of account options. */
+function AccountMenu({ profile, children, label }: { profile: Profile; children: ReactNode; label: string }) {
+  const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: Event) => {
+      if (event instanceof KeyboardEvent ? event.key === "Escape" : !root.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, [open]);
+  return <div className="account-menu" ref={root}>
+    <button className="profile-button" aria-haspopup="menu" aria-expanded={open} aria-label={label + " · " + profile.firstName} onClick={() => setOpen(!open)}>
+      {profile.avatar ? <img className="avatar" src={profile.avatar} alt="" referrerPolicy="no-referrer" /> : <span className="avatar" aria-hidden="true">{Array.from(profile.firstName)[0]?.toUpperCase()}</span>}
+      <span className="first-name">{profile.firstName}</span>
+      <svg className="chevron" viewBox="0 0 12 12" aria-hidden="true"><path d="m3 4.5 3 3 3-3"/></svg>
+    </button>
+    {open && <div className="menu" role="menu" onClick={() => setOpen(false)}>{children}</div>}
+  </div>;
 }
 
 const categoryOptions = (t: Translate) => categories.map(key => <option key={key} value={key}>{t(key)}</option>);
@@ -155,6 +181,18 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
         <form action={async data => { const result = await authAction(data); setMessage(result); }}><input type="hidden" name="mode" value="google" /><button className="outline">{t("google")}</button></form>
       </div>
     };
+    if (active.type === "profile") {
+      const profile = archive.profile;
+      return {title:t("profile"),content:<form onSubmit={event => perform(event,updateProfile,closeWithToast)}>
+        <div className="profile-preview">
+          {profile?.avatar ? <img className="avatar large" src={profile.avatar} alt="" referrerPolicy="no-referrer" /> : <span className="avatar large" aria-hidden="true">{Array.from(profile?.firstName ?? "?")[0]?.toUpperCase()}</span>}
+        </div>
+        <label>{t("firstName")}<input name="first_name" dir="auto" maxLength={40} required defaultValue={profile?.firstName ?? ""} autoComplete="given-name" /></label>
+        <label>{t("profilePhoto")}<input name="photo" type="file" accept="image/jpeg,image/png,image/webp" /><small>{t("photoLimit")}</small></label>
+        {profile?.avatarPath && <label className="check"><input type="checkbox" name="remove_photo" value="true" />{t("removePhoto")}</label>}
+        <button className="primary" disabled={busy}>{t("save")}</button>
+      </form>};
+    }
     if (active.type === "auth") return {
       title:t(active.mode),
       content:<form onSubmit={event => perform(event,authAction,result => {
@@ -164,6 +202,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
         } else if (result.success === "signedIn" || result.success === "passwordUpdated") closeWithToast(result);
       })}>
         <input type="hidden" name="mode" value={active.mode} />
+        {active.mode === "signup" && <label>{t("firstName")}<input name="first_name" dir="auto" maxLength={40} required autoComplete="given-name" /></label>}
         {active.mode !== "newPassword" && <label>{t("email")}<input type="email" name="email" autoComplete="email" maxLength={254} required /></label>}
         {active.mode !== "reset" && <label>{t("secret")}<input type="password" name="password" autoComplete={active.mode === "login" ? "current-password" : "new-password"} minLength={active.mode === "login" ? undefined : 8} maxLength={100} required /></label>}
         <div className="choices"><button className="primary" disabled={busy}>{t(active.mode)}</button>
@@ -223,7 +262,12 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
         <div className="actions">
           <button className="icon" onClick={switchLanguage} lang={language === "en" ? "ckb" : "en"}>{language === "en" ? "کوردی" : "English"}</button>
           <button className="icon" id="theme" aria-label={t(theme === "dark" ? "light" : "dark")} onClick={switchTheme}>{theme === "dark" ? "☀" : "☾"}</button>
-          <button className="outline" onClick={() => {nextContribution.current = null;open({type:"account"});}}>{t("account")}</button>
+          {archive.signedIn && archive.profile ? <AccountMenu profile={archive.profile} label={t("account")}>
+            {archive.admin && <a role="menuitem" href="/admin">{t("manage")}</a>}
+            <button role="menuitem" onClick={() => open({type:"submissions"})}>{t("status")}</button>
+            <button role="menuitem" onClick={() => open({type:"profile"})}>{t("profile")}</button>
+            <form onSubmit={event => perform(event,authAction,closeWithToast)}><input type="hidden" name="mode" value="logout" /><button role="menuitem" disabled={busy}>{t("logout")}</button></form>
+          </AccountMenu> : <button className="outline" onClick={() => {nextContribution.current = null;open({type:"account"});}}>{t("login")}</button>}
         </div>
       </div>
       <section className="intro"><div><p className="eyebrow">{t("archive")}</p><h1>{t("title")}</h1><p className="credit">{t("developed")} <strong>Ashkar Rashid</strong></p></div>

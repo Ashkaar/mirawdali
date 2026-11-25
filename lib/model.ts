@@ -17,10 +17,12 @@ export type Submission = { id: string; title: string; kind: Kind; status: Status
 export type Contribution = Submission & { body: string; category: Category | null; image_path: string | null; member_id: string | null };
 /** The owner manages everything; section admins manage only their sections. */
 export type Roles = { owner: boolean; tree: boolean; gallery: boolean; blog: boolean };
+/** What the header shows for the signed-in user. `avatar` is a /media path or an https URL. */
+export type Profile = { firstName: string; avatar: string | null; avatarPath: string | null };
 export type Archive = {
   configured: boolean; failed: boolean; publicRead: boolean; signedIn: boolean;
   /** True when the user can open the admin panel. */
-  admin: boolean; roles: Roles;
+  admin: boolean; roles: Roles; profile: Profile | null;
   members: Member[]; parents: Parent[]; partners: Partner[]; published: Contribution[]; mine: Submission[];
 };
 

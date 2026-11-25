@@ -346,3 +346,33 @@ a.outline { color: inherit; }
   .photo-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; padding: 8px; }
   .photo-grid .tile-copy { padding: 22px 9px 8px; font-size: .8125rem; }
 }
+
+/* Account menu: first name and round photo */
+.account-menu { position: relative; }
+.actions .profile-button { display: inline-flex; align-items: center; gap: 7px; padding: 3px 10px 3px 3px; }
+[dir="rtl"] .actions .profile-button { padding: 3px 3px 3px 10px; }
+.avatar {
+  width: 30px; height: 30px; flex: 0 0 30px; border-radius: 50%; object-fit: cover; display: inline-grid; place-items: center;
+  background: var(--accent); color: var(--accent-text); font-size: .8125rem; font-weight: 750;
+}
+.avatar.large { width: 84px; height: 84px; flex-basis: 84px; font-size: 2rem; }
+.profile-preview { display: flex; justify-content: center; }
+.first-name { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chevron { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .7; }
+.profile-button[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+.menu {
+  position: absolute; z-index: 6; inset-inline-end: 0; top: calc(100% + 10px); min-width: 200px; padding: 6px;
+  display: grid; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow);
+}
+.menu form { display: contents; }
+.menu [role="menuitem"] {
+  display: block; width: 100%; text-align: start; padding: 9px 12px; border: 0; border-radius: 9px; background: transparent;
+  color: inherit; font-size: .9rem; font-weight: 600; text-decoration: none;
+}
+.menu [role="menuitem"]:hover, .menu [role="menuitem"]:focus-visible { background: var(--soft); }
+.dialog-body .check { display: flex; align-items: center; gap: 8px; }
+@media(max-width: 700px) {
+  .first-name { max-width: 72px; }
+  .actions .profile-button { padding-inline-end: 7px; }
+  .avatar { width: 26px; height: 26px; flex-basis: 26px; }
+}

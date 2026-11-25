@@ -44,8 +44,10 @@ export async function authAction(form: FormData) {
   if (!email || email.length > 254 || !password || password.length > 100) return fail("invalid");
   if (mode === "signup") {
     if (password.length < 8) return fail("invalid");
+    const firstName = text(form, "first_name");
+    if (firstName.length > 40) return fail("invalid");
     const { error } = await db.auth.signUp({
-      email, password, options: { emailRedirectTo: siteUrl() },
+      email, password, options: { emailRedirectTo: siteUrl(), data: firstName ? { first_name: firstName } : undefined },
     });
     return error ? fail("authError") : ok("verifyEmail");
   }
@@ -92,4 +94,32 @@ export async function submitContribution(form: FormData) {
   }
   revalidatePath("/");
   return ok("submitted");
+}
+
+export async function updateProfile(form: FormData) {
+  const context = await userContext();
+  if (!context) return fail("signInFirst");
+  const { db, id } = context;
+  const firstName = text(form, "first_name");
+  if (!firstName || firstName.length > 40) return fail("invalid");
+  const { data: current } = await db.auth.getUser();
+  const previous = current.user?.user_metadata?.avatar_path as string | undefined;
+  const file = form.get("photo");
+  const removing = text(form, "remove_photo") === "true";
+  let path: string | null = null;
+  if (file instanceof File && file.size) {
+    path = await uploadPhoto(db, id, file);
+    if (!path) return fail("invalidPhoto");
+  }
+  const avatar = path ?? (removing ? null : previous ?? null);
+  const { error } = await db.auth.updateUser({ data: { first_name: firstName, avatar_path: avatar } });
+  if (error) {
+    await removePhotos(db, [path]);
+    return fail("saveFailed");
+  }
+  if (previous && previous !== avatar) await removePhotos(db, [previous]);
+  // The header reads the name and photo from the sign-in token, so issue a fresh one.
+  await db.auth.refreshSession();
+  revalidatePath("/");
+  return ok("profileSaved");
 }

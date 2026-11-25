@@ -57,3 +57,6 @@ Object.assign(production.ckb, {
   userDeleted:"هەژمارەکە سڕایەوە.", ownerOnly:"تەنها خاوەن دەتوانێت ئەمە بکات.", notFound:"ئەم بابەتە چیتر بوونی نییە.",
   adminOnly:"دەسەڵاتی بەڕێوەبردنی ئەم بەشەت نییە.", noRelatives:"ئەندامی زیاتر زیاد بکە بۆ بەستنەوەی دایک و باوک و هاوسەر.",
 });
+
+Object.assign(production.en, {profile:"Profile", firstName:"First name", profilePhoto:"Profile photo", removePhoto:"Remove current photo", profileSaved:"Profile saved."});
+Object.assign(production.ckb, {profile:"پرۆفایل", firstName:"ناوی یەکەم", profilePhoto:"وێنەی پرۆفایل", removePhoto:"لابردنی وێنەی ئێستا", profileSaved:"پرۆفایل پاشەکەوت کرا."});
