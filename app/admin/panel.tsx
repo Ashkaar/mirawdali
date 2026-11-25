@@ -127,7 +127,6 @@ export default function AdminPanel({ data, initialTab, editMemberId }: { data: A
   return <>
     <header className="admin-head">
       <div className="admin-top">
-        <a className="brand" href="/"><span className="crest" aria-hidden="true">M</span>{t("title")}</a>
         <div className="actions">
           <button className="icon" onClick={switchLanguage} lang={language === "en" ? "ckb" : "en"}>{language === "en" ? "کوردی" : "English"}</button>
           <button className="icon" id="theme" aria-label={t(theme === "dark" ? "light" : "dark")} onClick={switchTheme}>{theme === "dark" ? "☀" : "☾"}</button>

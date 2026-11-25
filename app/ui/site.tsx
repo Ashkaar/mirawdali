@@ -257,7 +257,6 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
   return <>
     <header className="masthead">
       <div className="top">
-        <a className="brand" href="#tree"><span className="crest" aria-hidden="true">M</span>{t("title")}</a>
         {navigation("tabs")}
         <div className="actions">
           <button className="icon" onClick={switchLanguage} lang={language === "en" ? "ckb" : "en"}>{language === "en" ? "کوردی" : "English"}</button>

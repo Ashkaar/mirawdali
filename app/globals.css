@@ -376,3 +376,11 @@ a.outline { color: inherit; }
   .actions .profile-button { padding-inline-end: 7px; }
   .avatar { width: 26px; height: 26px; flex-basis: 26px; }
 }
+
+/* No logo: keep the tabs centred and the actions at the end */
+.top > .tabs { grid-column: 2; }
+.top > .actions { grid-column: 3; }
+.admin-top { justify-content: flex-end; }
+@media(max-width: 700px) {
+  .top > .actions { grid-column: 1 / -1; }
+}
