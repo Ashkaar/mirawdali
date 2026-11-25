@@ -6,6 +6,7 @@ import type { Archive, Category, Contribution, Kind, Member, Profile } from "@/l
 import { authAction, submitContribution, updateProfile } from "@/app/actions";
 import { translate, type Language, type Translate } from "./copy";
 import Tree, { memberName, photoUrl } from "./tree";
+import Preferences from "./preferences";
 
 const views = ["home","tree","gallery","blog"] as const;
 const categories = ["memories","history","news"] as const;
@@ -29,7 +30,7 @@ function Dialog({ title, close, children, t }: { title: string; close: () => voi
     if (!dialog.current?.open) dialog.current?.showModal();
   }, []);
   return <dialog ref={dialog} aria-labelledby="dialog-title" onClose={close}>
-    <div className="dialog-head"><h2 id="dialog-title">{title}</h2><button className="icon" onClick={close}>{t("close")}</button></div>
+    <div className="dialog-head"><h2 id="dialog-title" dir="auto">{title}</h2><button className="icon" onClick={close}>{t("close")}</button></div>
     <div className="dialog-body">{children}</div>
   </dialog>;
 }
@@ -228,7 +229,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
       content:<>
         {active.entry.image_path && <img className="gallery-image" src={photoUrl(active.entry.image_path)} alt={active.entry.title} />}
         {active.entry.category && <p className="hint">{t(active.entry.category)}</p>}
-        {active.entry.body && <p className="entry-body">{active.entry.body}</p>}
+        {active.entry.body && <p className="entry-body" dir="auto">{active.entry.body}</p>}
       </>
     };
     if (active.type === "member") {
@@ -260,10 +261,10 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
   const tile = (entry: Contribution) => entry.kind === "photo" ?
     <button key={entry.id} className="tile photo-tile" onClick={() => open({type:"entry",entry})}>
       {entry.image_path && <img src={photoUrl(entry.image_path)} alt="" loading="lazy" />}
-      <span className="tile-copy"><strong>{entry.title}</strong></span>
+      <span className="tile-copy"><strong dir="auto">{entry.title}</strong></span>
     </button> : <button key={entry.id} className="tile post" onClick={() => open({type:"entry",entry})}>
-      {entry.category && <span className="category">{t(entry.category)}</span>}<strong>{entry.title}</strong>
-      <p>{entry.body.length > 180 ? entry.body.slice(0,180)+"…" : entry.body}</p>
+      {entry.category && <span className="category">{t(entry.category)}</span>}<strong dir="auto">{entry.title}</strong>
+      <p dir="auto">{entry.body.length > 180 ? entry.body.slice(0,180)+"…" : entry.body}</p>
     </button>;
   const photos = archive.published.filter(item => item.kind === "photo");
   const posts = archive.published.filter(item => item.kind === "post");
@@ -286,10 +287,9 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
   return <>
     <header className="masthead">
       <div className="top">
+        <Preferences language={language} theme={theme} onLanguage={switchLanguage} onTheme={switchTheme} t={t} />
         {navigation("tabs")}
-        <div className="actions">
-          <button className="icon" onClick={switchLanguage} lang={language === "en" ? "ckb" : "en"}>{language === "en" ? "کوردی" : "English"}</button>
-          <button className="icon" id="theme" aria-label={t(theme === "dark" ? "light" : "dark")} onClick={switchTheme}>{theme === "dark" ? "☀" : "☾"}</button>
+        <div className="actions account-actions">
           {archive.signedIn && archive.profile ? <AccountMenu profile={archive.profile} label={t("account")}>
             {archive.admin && <a role="menuitem" href="/admin">{t("manage")}</a>}
             <button role="menuitem" onClick={() => open({type:"submissions"})}>{t("status")}</button>

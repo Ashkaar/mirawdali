@@ -374,12 +374,18 @@ a.outline { color: inherit; }
   .avatar { width: 26px; height: 26px; flex-basis: 26px; }
 }
 
-/* No logo: keep the tabs centred and the actions at the end */
+/* Header: preferences at the start, tabs in the middle, account at the end */
+.top > .prefs { grid-column: 1; justify-self: start; }
 .top > .tabs { grid-column: 2; }
-.top > .actions { grid-column: 3; }
-.admin-top { justify-content: flex-end; }
+.top > .account-actions { grid-column: 3; }
+.admin-top { justify-content: space-between; }
+.lang-button { display: inline-flex; align-items: center; gap: 6px; }
+.flag { display: none; width: 24px; height: 16px; border-radius: 3px; box-shadow: 0 0 0 1px #0002; }
 @media(max-width: 700px) {
-  .top > .actions { grid-column: 1 / -1; }
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .lang-button .flag { display: block; }
+  .lang-button .lang-name { display: none; }
+  .actions .lang-button { padding: 8px 9px; }
 }
 
 /* Home tab */
@@ -406,3 +412,30 @@ a.outline { color: inherit; }
   .bottom-tabs button { font-size: .6875rem; }
 }
 .tile.post { display: flex; flex-direction: column; justify-content: flex-start; }
+
+/* Phone fixes from the mobile review */
+.plain { padding-block: 6px; }
+.admin-main > * { min-width: 0; }
+@media(max-width: 700px) {
+  .home-photos { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .bar { flex-wrap: wrap; }
+  .bar .search { width: 100%; }
+  .tree-foot { flex-direction: column; align-items: start; gap: 2px; }
+  .tree-canvas { padding-inline: 10px; }
+  .intro { padding-bottom: 42px; }
+  .form-row { grid-template-columns: 1fr; }
+  dialog { max-height: calc(100dvh - 24px); }
+  .dialog-head { position: sticky; top: 0; z-index: 1; background: var(--panel); }
+
+  /* Admin members table becomes stacked cards */
+  .admin-table thead { display: none; }
+  .admin-table, .admin-table tbody { display: block; }
+  .admin-table tr { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 4px 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .admin-table tr:last-child { border-bottom: 0; }
+  .admin-table td { padding: 0; border: 0; }
+  .admin-table td:nth-child(4) { grid-column: 2; grid-row: 1 / span 3; align-self: center; }
+  .admin-table td[data-label] { font-size: .8125rem; color: var(--muted); padding-inline-start: 49px; }
+  .admin-table td[data-label]::before { content: attr(data-label) " · "; font-weight: 650; }
+  .admin-table .row-actions { flex-direction: column; margin: 0; }
+  .who { min-width: 0; }
+}

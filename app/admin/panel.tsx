@@ -6,6 +6,7 @@ import type { AdminData, AdminEntry, AdminUser } from "@/lib/admin";
 import { categoryKeys, sectionKeys, type Kind, type Member, type Section, type Status } from "@/lib/model";
 import { translate, type Language, type Translate } from "@/app/ui/copy";
 import { memberName, photoUrl } from "@/app/ui/tree";
+import Preferences from "@/app/ui/preferences";
 import {
   deleteEntry, deleteMember, deleteUser, markSuggestionDone, publishEntry, saveMember, setEntryStatus,
   setUserBlocked, setUserSections, setVisibility, updateEntry,
@@ -127,11 +128,8 @@ export default function AdminPanel({ data, initialTab, editMemberId }: { data: A
   return <>
     <header className="admin-head">
       <div className="admin-top">
-        <div className="actions">
-          <button className="icon" onClick={switchLanguage} lang={language === "en" ? "ckb" : "en"}>{language === "en" ? "کوردی" : "English"}</button>
-          <button className="icon" id="theme" aria-label={t(theme === "dark" ? "light" : "dark")} onClick={switchTheme}>{theme === "dark" ? "☀" : "☾"}</button>
-          <a className="outline" href="/">{t("backToSite")}</a>
-        </div>
+        <Preferences language={language} theme={theme} onLanguage={switchLanguage} onTheme={switchTheme} t={t} />
+        <div className="actions"><a className="outline" href="/">{t("backToSite")}</a></div>
       </div>
       <div className="admin-title">
         <div><p className="eyebrow">{t("adminTitle")}</p><h1>{t(tab === "tree" ? "familyTree" : tab)}</h1></div>
@@ -222,8 +220,8 @@ function TreeTab(props: Shared) {
               {member.photo_path ? <img className="initial" src={photoUrl(member.photo_path)} alt="" loading="lazy" /> : <span className="initial" aria-hidden="true">{Array.from(memberName(member, language))[0]}</span>}
               <span><strong>{memberName(member, language)}</strong><small>{[language === "ckb" ? member.name_en : member.name_ckb, t(member.gender)].filter(Boolean).join(" · ")}</small></span>
             </div></td>
-            <td>{[member.birth_year, member.death_year].filter(Boolean).join(" – ") || "—"}</td>
-            <td>{parents.join(", ") || "—"}</td>
+            <td data-label={t("years")}>{[member.birth_year, member.death_year].filter(Boolean).join(" – ") || "—"}</td>
+            <td data-label={t("parent")}>{parents.join(", ") || "—"}</td>
             <td><div className="row-actions">
               <button className="outline" onClick={() => open({ type: "member", member })}>{t("edit")}</button>
               <ActionButton action={deleteMember} fields={{ id: member.id }} label={t("delete")} className="outline danger" confirmText={t("confirmDeleteMember")} perform={perform} busy={busy} />
@@ -269,8 +267,8 @@ function EntryList({ data, t, language, busy, perform, open, nameOf, kind }: Sha
             {entry.member_id && <span>{nameOf(entry.member_id)}</span>}
             {entry.applied_at && <span>{t("applied")}</span>}
           </p>
-          <h3>{entry.title}</h3>
-          {entry.body && <p className={kind === "post" ? "excerpt" : "entry-body"}>{entry.body}</p>}
+          <h3 dir="auto">{entry.title}</h3>
+          {entry.body && <p dir="auto" className={kind === "post" ? "excerpt" : "entry-body"}>{entry.body}</p>}
           <small className="byline">{t("submittedBy")} {entry.author_email ?? t("unknownAuthor")} · {formatDate(entry.created_at, language, t)}</small>
           <div className="row-actions">
             {entry.status !== "approved" && statusButton(entry, "approved", t(kind === "suggestion" ? "approve" : "publish"), "primary")}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Archive, Member, Parent } from "@/lib/archive";
 import type { Translate } from "./copy";
 
@@ -28,6 +28,14 @@ export default function Tree({archive, language, t, onMember}: {
   archive: Archive; language: string; t: Translate; onMember: (member: Member) => void;
 }) {
   const [search, setSearch] = useState("");
+  const canvas = useRef<HTMLDivElement>(null);
+  // On narrow screens the tree is wider than the view: start centred on the oldest generation.
+  useEffect(() => {
+    const element = canvas.current;
+    if (!element) return;
+    const offset = (element.scrollWidth - element.clientWidth) / 2;
+    element.scrollLeft = getComputedStyle(element).direction === "rtl" ? -offset : offset;
+  }, [language, archive.members.length]);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const members = useMemo(() => [...archive.members].sort((a,b) =>
     memberName(a,language).localeCompare(memberName(b,language))), [archive.members,language]);
@@ -74,7 +82,7 @@ export default function Tree({archive, language, t, onMember}: {
       {members.length > 0 && <input className="search" type="search" aria-label={t("search")} placeholder={t("search")} value={search} onChange={event => setSearch(event.target.value)} />}
     </div>
     {!members.length ? <p className="archive-empty">{t("noMembers")}</p> : <>
-      <div className="tree-canvas" tabIndex={0} aria-label={t("familyTree")}>
+      <div className="tree-canvas" ref={canvas} tabIndex={0} aria-label={t("familyTree")}>
         <div className="live-tree" style={{width,height}}>
           <svg width={width} height={height} aria-hidden="true" className="tree-links">
             {archive.parents.map(edge => {
