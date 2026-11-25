@@ -314,7 +314,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
         </>}
     </section></main>
     {navigation("tabs bottom-tabs")}
-    <footer><span>Mirawdali · میراودەلی</span><button className="plain" onClick={() => open({type:"privacy"})}>{t("privacy")}</button></footer>
+    <footer><span className="footer-brand"><img src="/logo.svg" alt="" width={36} height={36} />Mirawdali · میراودەلی</span><button className="plain" onClick={() => open({type:"privacy"})}>{t("privacy")}</button></footer>
     {currentPanel && <Dialog title={currentPanel.title} close={() => open(null)} t={t}>
       {currentPanel.content}
       {(message.error || message.success) && <p className="action-status" role={message.error ? "alert" : "status"}>{t(message.error ?? message.success ?? "")}</p>}
