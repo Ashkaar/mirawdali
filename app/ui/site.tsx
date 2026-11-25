@@ -3,18 +3,17 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import type { Archive, Category, Contribution, Kind, Member } from "@/lib/archive";
-import { authAction, reviewContribution, saveMember, setVisibility, submitContribution } from "@/app/actions";
+import { authAction, submitContribution } from "@/app/actions";
 import { translate, type Language, type Translate } from "./copy";
 import Tree, { memberName, photoUrl } from "./tree";
 
 const views = ["tree","gallery","blog"] as const;
 const categories = ["memories","history","news"] as const;
-const genders = ["unspecified","female","male","other"] as const;
 type View = typeof views[number];
 type AuthMode = "login" | "signup" | "reset" | "newPassword";
-type Panel = { type: "account" | "admin" | "privacy" | "submissions" } |
+type Panel = { type: "account" | "privacy" | "submissions" } |
   { type: "auth"; mode: AuthMode } | { type: "member"; member: Member } |
-  { type: "edit"; member?: Member; suggestion?: Contribution } | { type: "entry"; entry: Contribution } |
+  { type: "entry"; entry: Contribution } |
   { type: "contribute"; kind: Kind; member?: Member };
 type Result = { error?: string; success?: string };
 
@@ -142,7 +141,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
     if (active.type === "account") return {
       title:t("account"),
       content: !archive.configured ? <p>{t("unavailable")}</p> : archive.signedIn ? <div className="choices">
-        {archive.admin && <button className="primary" onClick={() => open({type:"admin"})}>{t("manage")}</button>}
+        {archive.admin && <a className="primary" href="/admin">{t("manage")}</a>}
         <button className="outline" onClick={() => open({type:"submissions"})}>{t("status")}</button>
         <form onSubmit={event => perform(event,authAction,closeWithToast)}><input type="hidden" name="mode" value="logout" /><button className="outline" disabled={busy}>{t("logout")}</button></form>
       </div> : <div className="choices">
@@ -199,66 +198,9 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
         <p>{[t(m.gender),m.birth_year && t("born")+" "+m.birth_year,m.death_year && t("deceased")+" "+m.death_year].filter(Boolean).join(" · ")}</p>
         {relationships.map(([label,ids]) => ids.length > 0 && <p key={label}><strong>{t(label)}</strong> · {ids.map(nameById).filter(Boolean).join(", ")}</p>)}
         <div className="choices"><button className="outline" onClick={() => contribute("suggestion",m)}>{t("suggest")}</button>
-          {archive.admin && <button className="primary" onClick={() => open({type:"edit",member:m})}>{t("editMember")}</button>}</div>
+          {archive.roles.tree && <a className="primary" href={"/admin?edit="+m.id}>{t("editMember")}</a>}</div>
       </>};
     }
-    if (active.type === "edit") {
-      const member = active.member;
-      const parents = archive.parents.filter(edge => edge.child_id === member?.id).map(edge => edge.parent_id);
-      const partners = archive.partners.filter(edge => edge.first_id === member?.id || edge.second_id === member?.id).map(edge => edge.first_id === member?.id ? edge.second_id : edge.first_id);
-      return {title:t(member ? "editMember" : "addMember"),content:<form key={member?.id ?? "new"} onSubmit={event => perform(event,saveMember,closeWithToast)}>
-        <input type="hidden" name="id" value={member?.id ?? ""} />
-        {active.suggestion && <div className="review-item"><input type="hidden" name="suggestion" value={active.suggestion.id} /><strong>{active.suggestion.title}</strong><p className="entry-body">{active.suggestion.body}</p></div>}
-        <label>{t("englishName")}<input name="name_en" dir="auto" maxLength={140} defaultValue={member?.name_en ?? ""} /></label>
-        <label>{t("soraniName")}<input name="name_ckb" dir="auto" maxLength={140} defaultValue={member?.name_ckb ?? ""} /></label>
-        <label>{t("gender")}<select name="gender" defaultValue={member?.gender ?? "unspecified"}>{genders.map(key => <option key={key} value={key}>{t(key)}</option>)}</select></label>
-        <div className="form-row">
-          <label>{t("birthYear")}<input name="birth_year" type="number" min={1} max={9999} defaultValue={member?.birth_year ?? ""} /></label>
-          <label>{t("deathYear")}<input name="death_year" type="number" min={1} max={9999} defaultValue={member?.death_year ?? ""} /></label>
-        </div>
-        <label>{t("addPhoto")}<input name="photo" type="file" accept="image/jpeg,image/png,image/webp" /><small>{t("photoLimit")}</small></label>
-        {archive.members.length > (member ? 1 : 0) && <>
-          <p className="hint">{t("relationshipsHint")}</p>
-          <div className="form-row">
-            <label>{t("parent")}<select multiple name="parents" defaultValue={parents}>{selectMemberOptions(member?.id)}</select></label>
-            <label>{t("partnerField")}<select multiple name="partners" defaultValue={partners}>{selectMemberOptions(member?.id)}</select></label>
-          </div>
-        </>}
-        <div className="choices"><button className="primary" disabled={busy}>{t("save")}</button><button type="button" className="plain" onClick={() => open({type:"admin"})}>{t("back")}</button></div>
-      </form>};
-    }
-    if (active.type === "admin") return {title:t("manage"),content:<>
-      <div className="choices"><button className="primary" onClick={() => open({type:"edit"})}>{t("addMember")}</button></div>
-      <form className="visibility-form" onSubmit={event => perform(event,setVisibility)}>
-        <label>{t("visibility")}<select name="visibility" defaultValue={archive.publicRead ? "public" : "private"}><option value="public">{t("everyone")}</option><option value="private">{t("membersOnly")}</option></select></label>
-        <button className="outline" disabled={busy}>{t("save")}</button>
-      </form>
-      <h3>{t("queue")}</h3><p className="hint">{t("adminHint")}</p>
-      {!archive.queue.length && <p>{t("empty")}</p>}
-      {archive.queue.map(entry => <article className="review-item" key={entry.id}>
-        <p className="category">{t(entry.kind)}{entry.category ? " · "+t(entry.category) : ""}</p>
-        <h3>{entry.title}</h3>
-        {entry.member_id && <p>{nameById(entry.member_id)}</p>}
-        {entry.image_path && <img className="gallery-image" src={photoUrl(entry.image_path)} alt={entry.title} loading="lazy" />}
-        {entry.body && <p className="entry-body">{entry.body}</p>}
-        <form onSubmit={event => perform(event,reviewContribution)}>
-          <input type="hidden" name="id" value={entry.id} />
-          <div className="choices">
-            <button name="decision" value="approved" disabled={busy} className="primary">{t("approve")}</button>
-            <button name="decision" value="rejected" disabled={busy} className="outline">{t("reject")}</button>
-          </div>
-        </form>
-      </article>)}
-      {archive.readySuggestions.length > 0 && <h3>{t("acceptedSuggestions")}</h3>}
-      {archive.readySuggestions.map(entry => <article className="review-item" key={entry.id}>
-        <h3>{entry.title}</h3>
-        <p className="entry-body">{entry.body}</p>
-        <button className="outline" onClick={() => {
-          const member = archive.members.find(item => item.id === entry.member_id);
-          open({type:"edit",member,suggestion:entry});
-        }}>{t(entry.member_id ? "editMember" : "addMember")}</button>
-      </article>)}
-    </>};
     return {title:t("status"),content: archive.mine.length ? <ul className="submissions">
       {archive.mine.map(entry => <li key={entry.id}><strong>{entry.title}</strong> <span>{t(entry.kind)} · {t(entry.status)}</span></li>)}
     </ul> : <p>{t("noSubmissions")}</p>};

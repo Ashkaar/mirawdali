@@ -15,7 +15,25 @@ A bilingual family archive built with Next.js and Supabase. English is the defau
    values ('00000000-0000-0000-0000-000000000000');
    ```
 
-Archive browsing starts public. The admin can switch browsing to signed-in accounts under **Account → Manage archive**. Approved image access follows the same policy. Pending images are visible to their submitter and the admin. The cover is a static page asset.
+Archive browsing starts public. The owner can switch browsing to signed-in accounts in the admin panel's **Settings** tab. Approved image access follows the same policy. Pending images are visible to their submitter and the admins of that section. The cover is a static page asset.
+
+## Admin panel
+
+Admins open `/admin` from **Account → Admin panel**.
+
+- **Owner**: the single account in `archive_admin`. Manages every section, all user accounts and the browsing setting.
+- **Section admins**: any account the owner ticks under **Users → Admin of**. Each can manage the tree, the gallery, the blog, or any combination of them.
+
+| Tab | Who sees it | What it does |
+|---|---|---|
+| Overview | Every admin | Counts for their sections and everything waiting for review |
+| Tree | Tree admins | Add, edit and delete family members; approve, apply or dismiss tree suggestions |
+| Gallery | Gallery admins | Add photos directly; publish, unpublish, edit or delete any photo |
+| Blog | Blog admins | Write posts directly; publish, unpublish, edit or delete any post |
+| Users | Owner | Assign section roles, block or unblock, and delete accounts |
+| Settings | Owner | Choose who can browse the archive |
+
+Blocking an account signs it out, removes its admin roles and stops it from signing in. Deleting an account also deletes everything it submitted. The owner cannot be blocked or deleted. Every permission is enforced in the database (`supabase/migrations/202611250003_section_admins.sql`), not only in the interface.
 
 ## Run and deploy
 

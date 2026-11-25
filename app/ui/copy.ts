@@ -18,3 +18,42 @@ export function translate(lang: Language): Translate {
 
 Object.assign(production.en, {submitPhoto:"Submit a photo",empty:"No submissions are waiting for review.",none:"None",acceptedSuggestions:"Approved tree suggestions"});
 Object.assign(production.ckb, {submitPhoto:"ناردنی وێنە",empty:"هیچ نێردراوێک چاوەڕوان نییە.",none:"هیچ",acceptedSuggestions:"پێشنیارە پەسەندکراوەکانی دارەوە"});
+
+Object.assign(production.en, {
+  manage:"Admin panel", adminTitle:"Admin panel", backToSite:"Back to site", overview:"Overview", users:"Users", settings:"Settings",
+  owner:"Owner", yourAccess:"Your access", fullAccess:"Full access", membersCount:"Family members", pendingCount:"Waiting for review",
+  publishedCount:"Published", usersCount:"Accounts", addPost:"Add post", addGalleryPhoto:"Add photo", edit:"Edit", delete:"Delete",
+  publish:"Publish", unpublish:"Unpublish", moveToPending:"Move to pending", statusAll:"All", statusPending:"Pending",
+  statusPublished:"Published", statusRejected:"Rejected", submittedBy:"By", unknownAuthor:"Deleted account", treeSuggestions:"Tree suggestions",
+  applyToTree:"Apply to tree", markDone:"Mark as done", applied:"Applied", noEntries:"Nothing here yet.", noSuggestions:"No tree suggestions.",
+  confirmDelete:"Delete this permanently? This cannot be undone.", confirmDeleteMember:"Delete this family member? Their parent, child and partner links will also be removed.",
+  confirmDeleteUser:"Delete this account and everything it submitted? This cannot be undone.", confirmBlock:"Block this account? It will be signed out, lose any admin roles and be unable to sign in.",
+  joined:"Joined", lastSignIn:"Last sign-in", never:"Never", unconfirmed:"Email not confirmed", blocked:"Blocked", block:"Block", unblock:"Unblock",
+  adminOf:"Admin of", saveRoles:"Save roles", you:"You", submissionsCount:"Submissions", years:"Years", actions:"Actions", editEntry:"Edit entry",
+  ownerNote:"The owner has full access to every section, the users list and settings.",
+  rolesNote:"Section admins can add, edit, publish and delete everything in the sections ticked for them, and review what relatives submit there.",
+  visibilityHint:"Choose who can browse the tree, gallery and blog.", treeAdminHint:"Approve suggestions, then apply them to the tree or mark them as done.",
+  memberDeleted:"Family member deleted.", suggestionDone:"Suggestion marked as done.", entryPublished:"Published.", entrySaved:"Changes saved.",
+  statusSaved:"Status updated.", entryDeleted:"Deleted.", rolesSaved:"Roles updated.", userBlocked:"Account blocked.", userUnblocked:"Account unblocked.",
+  userDeleted:"Account deleted.", ownerOnly:"Only the owner can do this.", notFound:"That item no longer exists.",
+  adminOnly:"You don't have permission to manage this section.", noRelatives:"Add more family members to link parents and partners.",
+});
+Object.assign(production.ckb, {
+  manage:"پانێڵی بەڕێوەبردن", adminTitle:"پانێڵی بەڕێوەبردن", backToSite:"گەڕانەوە بۆ ماڵپەڕ", overview:"پوختە", users:"بەکارهێنەران", settings:"ڕێکخستنەکان",
+  owner:"خاوەن", yourAccess:"دەسەڵاتەکانت", fullAccess:"دەسەڵاتی تەواو", membersCount:"ئەندامانی بنەماڵە", pendingCount:"چاوەڕوانی پێداچوونەوە",
+  publishedCount:"بڵاوکراوە", usersCount:"هەژمارەکان", addPost:"زیادکردنی بابەت", addGalleryPhoto:"زیادکردنی وێنە", edit:"دەستکاری", delete:"سڕینەوە",
+  publish:"بڵاوکردنەوە", unpublish:"لابردن لە بڵاوکردنەوە", moveToPending:"گەڕاندنەوە بۆ چاوەڕوان", statusAll:"هەموو", statusPending:"چاوەڕوان",
+  statusPublished:"بڵاوکراوە", statusRejected:"ڕەتکراوە", submittedBy:"لەلایەن", unknownAuthor:"هەژماری سڕاوە", treeSuggestions:"پێشنیارەکانی دارەوە",
+  applyToTree:"جێبەجێکردن لە دارەوە", markDone:"وەک تەواوبوو دیاری بکە", applied:"جێبەجێکراوە", noEntries:"هێشتا هیچ شتێک نییە.", noSuggestions:"هیچ پێشنیارێک نییە.",
+  confirmDelete:"بە یەکجاری بیسڕیتەوە؟ ناگەڕێتەوە.", confirmDeleteMember:"ئەم ئەندامە بسڕیتەوە؟ پەیوەندییەکانی دایک و باوک و منداڵ و هاوسەریشی لادەبرێن.",
+  confirmDeleteUser:"ئەم هەژمارە و هەموو نێردراوەکانی بسڕیتەوە؟ ناگەڕێتەوە.", confirmBlock:"ئەم هەژمارە ڕابگریت؟ دەکرێتە دەرەوە، دەسەڵاتەکانی لادەبرێن و ناتوانێت بچێتە ژوورەوە.",
+  joined:"بەشداربوون", lastSignIn:"دوایین چوونەژوورەوە", never:"هەرگیز", unconfirmed:"ئیمەیڵ پشتڕاست نەکراوەتەوە", blocked:"ڕاگیراو", block:"ڕاگرتن", unblock:"لابردنی ڕاگرتن",
+  adminOf:"بەڕێوەبەری", saveRoles:"پاشەکەوتکردنی دەسەڵاتەکان", you:"تۆ", submissionsCount:"نێردراوەکان", years:"ساڵەکان", actions:"کردارەکان", editEntry:"دەستکاریکردن",
+  ownerNote:"خاوەن دەسەڵاتی تەواوی هەیە بەسەر هەموو بەشەکان، بەکارهێنەران و ڕێکخستنەکاندا.",
+  rolesNote:"بەڕێوەبەری بەش دەتوانێت لەو بەشانەی بۆی دیاریکراون هەموو شتێک زیاد بکات، دەستکاری بکات، بڵاوی بکاتەوە و بیسڕێتەوە، و پێداچوونەوە بە نێردراوەکاندا بکات.",
+  visibilityHint:"دیاری بکە کێ دەتوانێت دارەوە و گالەری و بلۆگ ببینێت.", treeAdminHint:"پێشنیارەکان پەسەند بکە، پاشان لە دارەوەکە جێبەجێیان بکە یان وەک تەواوبوو دیارییان بکە.",
+  memberDeleted:"ئەندامەکە سڕایەوە.", suggestionDone:"پێشنیارەکە وەک تەواوبوو دیاری کرا.", entryPublished:"بڵاوکرایەوە.", entrySaved:"گۆڕانکارییەکان پاشەکەوت کران.",
+  statusSaved:"دۆخەکە نوێ کرایەوە.", entryDeleted:"سڕایەوە.", rolesSaved:"دەسەڵاتەکان نوێ کرانەوە.", userBlocked:"هەژمارەکە ڕاگیرا.", userUnblocked:"ڕاگرتنی هەژمارەکە لابرا.",
+  userDeleted:"هەژمارەکە سڕایەوە.", ownerOnly:"تەنها خاوەن دەتوانێت ئەمە بکات.", notFound:"ئەم بابەتە چیتر بوونی نییە.",
+  adminOnly:"دەسەڵاتی بەڕێوەبردنی ئەم بەشەت نییە.", noRelatives:"ئەندامی زیاتر زیاد بکە بۆ بەستنەوەی دایک و باوک و هاوسەر.",
+});
