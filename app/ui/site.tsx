@@ -278,7 +278,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
           <button className="outline" onClick={() => {nextContribution.current = null;open({type:"account"});}}>{t("account")}</button>
         </div>
       </div>
-      <section className="intro"><div><p className="eyebrow">{t("archive")}</p><h1>{t("title")}</h1><p className="credit">{t("developed")} <strong>AAA</strong></p></div>
+      <section className="intro"><div><p className="eyebrow">{t("archive")}</p><h1>{t("title")}</h1><p className="credit">{t("developed")} <strong>Ashkar Rashid</strong></p></div>
         {archive.configured && !archive.failed && canBrowse && <button className="primary" onClick={() => contribute(currentKind)}>{t(actionLabel[currentKind])}</button>}
       </section>
     </header>
