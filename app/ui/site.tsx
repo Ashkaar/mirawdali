@@ -8,6 +8,7 @@ import { translate, type Language, type Translate } from "./copy";
 import Tree, { memberName, photoUrl } from "./tree";
 import Preferences from "./preferences";
 import PhotoCrop from "./photo-crop";
+import Home from "./home";
 
 const views = ["home","tree","gallery","blog"] as const;
 const categories = ["memories","history","news"] as const;
@@ -275,21 +276,6 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
       {entry.category && <span className="category">{t(entry.category)}</span>}<strong dir="auto">{entry.title}</strong>
       <p dir="auto">{entry.body.length > 180 ? entry.body.slice(0,180)+"…" : entry.body}</p>
     </button>;
-  const photos = archive.published.filter(item => item.kind === "photo");
-  const posts = archive.published.filter(item => item.kind === "post");
-  const home = <>
-    <div className="bar"><div><h2>{t("welcome")}</h2><p>{t("homeIntro")}</p></div></div>
-    <div className="home-stats">
-      {([["tree","membersCount",archive.members.length],["gallery","photosCount",photos.length],["blog","postsCount",posts.length]] as const).map(([tab,label,count]) =>
-        <button key={tab} className="stat" onClick={() => go(tab)}>
-          <svg className="stat-icon" viewBox="0 0 24 24" aria-hidden="true">{tabIcons[tab]}</svg><b>{count}</b><span>{t(label)}</span>
-        </button>)}
-    </div>
-    <div className="home-head"><h3>{t("latestPhotos")}</h3>{photos.length > 0 && <button className="plain" onClick={() => go("gallery")}>{t("seeAll")}</button>}</div>
-    <div className="content photo-grid home-photos">{photos.length ? photos.slice(0,4).map(tile) : <p className="empty-posts">{t("noPhotos")}</p>}</div>
-    <div className="home-head"><h3>{t("latestPosts")}</h3>{posts.length > 0 && <button className="plain" onClick={() => go("blog")}>{t("seeAll")}</button>}</div>
-    <div className="content">{posts.length ? posts.slice(0,3).map(tile) : <p className="empty-posts">{t("noPosts")}</p>}</div>
-  </>;
   const navigation = (className: string) => <nav className={className} aria-label={language === "en" ? "Main navigation" : "ڕێنیشاندەری سەرەکی"}>
     {views.map(tab => <button key={tab} onClick={() => go(tab)} aria-current={tab === view ? "page" : undefined}><svg className="tab-icon" viewBox="0 0 24 24" aria-hidden="true">{tabIcons[tab]}</svg><span>{t(tab)}</span></button>)}
   </nav>;
@@ -311,18 +297,20 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
         {archive.configured && !archive.failed && canBrowse && currentKind && <button className="primary" onClick={() => contribute(currentKind)}>{t(actionLabel[currentKind])}</button>}
       </section>
     </header>
-    <main><section className="frame">
+    <main>{archive.configured && !archive.failed && canBrowse && view === "home" ?
+      <Home archive={archive} language={language} t={t} go={go} openEntry={entry => open({type:"entry",entry})} contribute={kind => contribute(kind)} /> :
+      <section className="frame">
       {!archive.configured || archive.failed || !canBrowse ? <div className="bar"><div><h2>{t(view === "tree" ? "familyTree" : view)}</h2>
         <p>{t(!archive.configured ? "setup" : archive.failed ? "loadError" : "privateArchive")}</p></div>
         {archive.configured && !archive.failed && <button className="primary" onClick={() => open({type:"account"})}>{t("login")}</button>}</div> :
-        view === "home" ? home : view === "tree" ? <Tree archive={archive} language={language} t={t} onMember={member => open({type:"member",member})} /> : <>
+        view === "tree" ? <Tree archive={archive} language={language} t={t} onMember={member => open({type:"member",member})} /> : <>
           <div className="bar"><div><h2>{t(view)}</h2><p>{t(view === "blog" ? "blogHint" : "galleryHint")}</p></div></div>
           {view === "blog" && <div className="categories" role="group" aria-label={t("filter")}>
             {(["all",...categories] as const).map(category => <button key={category} className="outline" aria-pressed={category === filter} onClick={() => setFilter(category)}>{t(category)}</button>)}
           </div>}
           <div className={"content"+(view === "gallery" ? " photo-grid" : "")} aria-live="polite">{published.length ? published.map(tile) : <p className="empty-posts">{t(view === "blog" ? "noPosts" : "noPhotos")}</p>}</div>
         </>}
-    </section></main>
+    </section>}</main>
     {navigation("tabs bottom-tabs")}
     <footer><span className="footer-brand"><img src="/logo.svg" alt="" width={36} height={36} />Mirawdali · میراودەلی</span><button className="plain" onClick={() => open({type:"privacy"})}>{t("privacy")}</button></footer>
     {currentPanel && <Dialog title={currentPanel.title} close={() => open(null)} t={t}>

@@ -66,3 +66,44 @@ Object.assign(production.ckb, {home:"سەرەکی", welcome:"بەخێربێن ب
 
 Object.assign(production.en, {add:"Add", remove:"Remove", zoom:"Zoom", zoomIn:"Zoom in", zoomOut:"Zoom out", cropHint:"Drag to move the photo. Pinch, scroll or use the slider to zoom.", cancelPhoto:"Don't use this photo"});
 Object.assign(production.ckb, {add:"زیادکردن", remove:"لابردن", zoom:"گەورەکردن", zoomIn:"گەورەکردن", zoomOut:"بچووککردنەوە", cropHint:"وێنەکە ڕابکێشە بۆ جووڵاندنی. بۆ گەورە و بچووککردن دوو پەنجە یان سلایدەرەکە بەکاربهێنە.", cancelPhoto:"ئەم وێنەیە بەکار مەهێنە"});
+
+Object.assign(production.en, {
+  aboutEyebrow:"About the tribe", aboutTitle:"The Mirawdali tribe",
+  aboutBody:"Mirawdali — also written Mirawdale, Mirawdeli or Mirawdaly, and known as Agha, Pizhdar or Pishdar — is a Kurdish tribe of Iraqi Kurdistan. It is estimated at more than 15,000 families, living mainly in the Pshdar area of the Kurdistan Region, with some near the border with Iran.",
+  familiesValue:"15,000+", familiesStat:"Families, estimated",
+  purposeEyebrow:"Why this archive", purposeTitle:"Keeping our names, faces and stories",
+  purposeBody:"Family history lives in the memories of our elders and in old photographs scattered across many homes. This archive brings it together in one place — a family tree, a photo gallery and a collection of stories — so it can be shared today and kept for the generations to come.",
+  pillarTree:"Every generation, connected", pillarGallery:"Faces and places from the past", pillarStories:"Memories told by the family",
+  treeTitle:"See how we are connected", treeBody:"A glimpse of the family tree. Open the full tree to search for any relative and follow every branch.",
+  exploreTree:"Explore the full tree", sampleGrandparents:"Grandparents", sampleParents:"Parents", sampleChildren:"Children",
+  photosEyebrow:"From the gallery", photosTitle:"Photographs from the family", viewGallery:"View the gallery",
+  previousPhoto:"Previous photo", nextPhoto:"Next photo", goToPhoto:"Go to photo",
+  storiesEyebrow:"From the blog", storiesTitle:"Latest stories and articles", readBlog:"Read the blog", readMore:"Read",
+  howEyebrow:"How it works", howTitle:"An archive we build together",
+  step1Title:"Explore", step1Body:"Browse the family tree, the photographs and the stories.",
+  step2Title:"Create an account", step2Body:"Sign up with your email address. It only takes a minute.",
+  step3Title:"Contribute", step3Body:"Suggest a correction to the tree, send an old photograph, or write down a family story.",
+  step4Title:"Reviewed and published", step4Body:"The archive's editors check every submission before it is added, so the record stays accurate.",
+  collabEyebrow:"Join in", collabTitle:"This is a collaborative work",
+  collabBody:"Every name, date and photograph here was shared by relatives like you. If someone is missing, a date is wrong, or you have a photo or a story to share, add it — the archive grows with every contribution.",
+});
+Object.assign(production.ckb, {
+  aboutEyebrow:"دەربارەی هۆز", aboutTitle:"هۆزی میراودەلی",
+  aboutBody:"میراودەلی، کە بە ئاغا و پشدەریش ناسراوە، هۆزێکی کوردە لە کوردستانی عێراق. ژمارەی خێزانەکانی بە زیاتر لە ١٥٬٠٠٠ خێزان مەزەندە دەکرێت، زۆربەیان لە ناوچەی پشدەری هەرێمی کوردستان دەژین و هەندێکیشیان نزیک سنووری ئێران.",
+  familiesValue:"+١٥٬٠٠٠", familiesStat:"خێزان، بە مەزەندە",
+  purposeEyebrow:"بۆچی ئەم ئەرشیفە", purposeTitle:"پاراستنی ناو و ڕوخسار و چیرۆکەکانمان",
+  purposeBody:"مێژووی بنەماڵە لە یادەوەریی گەورەکانمان و لە وێنە کۆنەکانی ناو ماڵە جیاوازەکاندا دەژی. ئەم ئەرشیفە هەمووی لە یەک شوێندا کۆدەکاتەوە — شەجەرەی خێزان، گالەریی وێنە و کۆمەڵێک چیرۆک — بۆ ئەوەی ئەمڕۆ هاوبەش بکرێت و بۆ نەوەکانی داهاتوو بپارێزرێت.",
+  pillarTree:"هەموو نەوەکان، بەیەکەوە بەستراو", pillarGallery:"ڕوخسار و شوێنەکانی ڕابردوو", pillarStories:"یادەوەرییەکان بە زمانی بنەماڵە",
+  treeTitle:"ببینە چۆن بەیەکەوە بەستراوین", treeBody:"سەیرێکی کورتی شەجەرەکە. شەجەرەی تەواو بکەرەوە بۆ گەڕان بەدوای هەر خزمێکدا و شوێنکەوتنی هەموو لقێک.",
+  exploreTree:"بینینی شەجەرەی تەواو", sampleGrandparents:"باپیران", sampleParents:"دایک و باوک", sampleChildren:"منداڵان",
+  photosEyebrow:"لە گالەرییەوە", photosTitle:"وێنەکانی بنەماڵە", viewGallery:"بینینی گالەری",
+  previousPhoto:"وێنەی پێشوو", nextPhoto:"وێنەی دواتر", goToPhoto:"چوون بۆ وێنەی",
+  storiesEyebrow:"لە بلۆگەوە", storiesTitle:"دوایین چیرۆک و بابەتەکان", readBlog:"خوێندنەوەی بلۆگ", readMore:"خوێندنەوە",
+  howEyebrow:"چۆن کار دەکات", howTitle:"ئەرشیفێک کە بەیەکەوە دروستی دەکەین",
+  step1Title:"بگەڕێ", step1Body:"شەجەرەی خێزان و وێنە و چیرۆکەکان ببینە.",
+  step2Title:"هەژمارێک دروست بکە", step2Body:"بە ئیمەیڵەکەت خۆت تۆمار بکە. تەنها یەک خولەک دەخایەنێت.",
+  step3Title:"بەشداری بکە", step3Body:"پێشنیاری ڕاستکردنەوەی شەجەرەکە بکە، وێنەیەکی کۆن بنێرە، یان چیرۆکێکی بنەماڵە بنووسە.",
+  step4Title:"پێداچوونەوە و بڵاوکردنەوە", step4Body:"بەڕێوەبەرانی ئەرشیف پێش زیادکردن پێداچوونەوە بە هەموو نێردراوێکدا دەکەن، بۆ ئەوەی زانیارییەکان ورد بمێننەوە.",
+  collabEyebrow:"بەشدار بە", collabTitle:"ئەمە کارێکی هاوبەشە",
+  collabBody:"هەموو ناو و ڕێکەوت و وێنەیەکی ئێرە لەلایەن خزمانی وەک تۆوە هاوبەش کراوە. ئەگەر کەسێک ون بوو، ڕێکەوتێک هەڵە بوو، یان وێنە یان چیرۆکێکت هەیە، زیادی بکە — ئەرشیفەکە بە هەر بەشدارییەک گەورەتر دەبێت.",
+});
