@@ -60,8 +60,7 @@ function TreePreview({ language, t, go }: Pick<Props, "language" | "t" | "go">) 
   const nodes: Node[] = sampleFamily.flatMap((row, r) => row.map((person, i) => ({
     key: person.key, row: r, parent: person.parent, female: Boolean(person.female),
     name: language === "ckb" ? person.ckb : person.en,
-    // Leave room on the start side for the generation numbers.
-    x: r === 0 ? [40, 70][i] : row.length === 1 ? 55 : 18 + 74 * i / (row.length - 1),
+    x: r === 0 ? [36, 64][i] : row.length === 1 ? 50 : 12 + 76 * i / (row.length - 1),
     y: 7 + 86 * r / (rows - 1),
   })));
   const at = new Map(nodes.map(item => [item.key, item]));
@@ -88,9 +87,6 @@ function TreePreview({ language, t, go }: Pick<Props, "language" | "t" | "go">) 
           d={`M ${startX} ${startY} C ${startX} ${mid}, ${endX} ${mid}, ${endX} ${endY}`} />;
       })}
     </svg>
-    {sampleFamily.map((_, r) => <span key={r} className="generation-mark" style={{ top: 7 + 86 * r / (rows - 1) + "%", transitionDelay: rowDelay(r) + "s" }}>
-      {(r + 1).toLocaleString(language === "ckb" ? "ar-IQ" : "en-GB")}
-    </span>)}
     {nodes.map(item => <span key={item.key} className={"tree-chip row-" + Math.min(item.row, 2) + (item.female ? " female" : "")}
       style={{ left: item.x + "%", top: item.y + "%", transitionDelay: rowDelay(item.row) + "s" }}>
       <span className="chip-initial" aria-hidden="true">{Array.from(item.name)[0]}</span>
