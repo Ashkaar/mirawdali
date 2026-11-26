@@ -33,8 +33,8 @@
   --panel: #231d25;
   --ink: #f7edf2;
   --muted: #cdbcc4;
-  --accent: #ebb1c7;
-  --accent-text: #371b29;
+  --accent: #e2b36f;
+  --accent-text: #2a1a0c;
   --line: #483941;
   --soft: #32242d;
   --branch: #a98676;
@@ -45,12 +45,12 @@
   --hero-edge: #21192027;
   --hero-ink: #fff3f8;
   --glass-fill: #2b222ee0;
-  --glass-edge: #e3aec04d;
+  --glass-edge: #e6cfae4d;
   --glass-highlight: #fff0ff2d;
   --glass-shadow: #130d1a5e;
-  --glass-selected: #ebb1c7;
-  --glass-selected-ink: #371b29;
-  --glass-hover: #ebb1c723;
+  --glass-selected: #e2b36f;
+  --glass-selected-ink: #2a1a0c;
+  --glass-hover: #e2b36f24;
   --lg-top: #3b2f3bc7;
   --lg-bottom: #231c258c;
   --lg-rim: #ffffff2e;
@@ -71,8 +71,7 @@ h1, h2, .post strong { font-family: Georgia, serif; }
 .masthead {
   --cover-direction: to right;
   color: var(--hero-ink);
-  background: var(--hero-base);
-  border-bottom: 1px solid var(--line);
+  background: linear-gradient(var(--hero-base) 55%, var(--bg));
   position: relative;
   isolation: isolate;
 }
@@ -88,10 +87,14 @@ h1, h2, .post strong { font-family: Georgia, serif; }
   inset-inline: 25% 0;
   z-index: -2;
   background: url(/mirawdali-cover-sketch.webp) center 14% / cover no-repeat;
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 98%);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent 98%);
 }
 .masthead::after {
   inset: 0;
   z-index: -1;
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 98%);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent 98%);
   background: linear-gradient(var(--cover-direction), var(--hero-base) 24%, var(--hero-mid) 34%, var(--hero-fade) 61%, var(--hero-edge) 83%);
 }
 .top, .intro, main, footer { max-width: 1232px; margin-inline: auto; }
