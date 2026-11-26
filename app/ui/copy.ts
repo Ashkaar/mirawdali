@@ -107,3 +107,6 @@ Object.assign(production.ckb, {
   collabEyebrow:"بەشدار بە", collabTitle:"ئەمە کارێکی هاوبەشە",
   collabBody:"هەموو ناو و ڕێکەوت و وێنەیەکی ئێرە لەلایەن خزمانی وەک تۆوە هاوبەش کراوە. ئەگەر کەسێک ون بوو، ڕێکەوتێک هەڵە بوو، یان وێنە یان چیرۆکێکت هەیە، زیادی بکە — ئەرشیفەکە بە هەر بەشدارییەک گەورەتر دەبێت.",
 });
+
+Object.assign(production.en, { treeTitle:"Seven generations, one family", treeBody:"An illustration of how the tree links generation to generation — the names here are examples. Open the full tree to find your own family and follow every branch.", generations:"Generations" });
+Object.assign(production.ckb, { treeTitle:"حەوت نەوە، یەک بنەماڵە", treeBody:"نموونەیەک لەوەی چۆن شەجەرەکە نەوە بە نەوە بەیەکەوە دەبەستێتەوە — ناوەکانی ئێرە تەنها نموونەن. شەجەرەی تەواو بکەرەوە بۆ دۆزینەوەی بنەماڵەکەی خۆت و شوێنکەوتنی هەموو لقێک.", generations:"نەوەکان" });

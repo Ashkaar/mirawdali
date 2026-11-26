@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import type { Archive, Contribution, Kind, Member } from "@/lib/model";
+import type { Archive, Contribution, Kind } from "@/lib/model";
 import type { Language, Translate } from "./copy";
 import { memberName, photoUrl } from "./tree";
 
@@ -42,61 +42,32 @@ function useReveal() {
   return root;
 }
 
-type Node = { key: string; x: number; y: number; name: string; photo: string | null; row: number };
+// An illustrative family across seven generations. The names are examples, not real people.
+type Person = { key: string; en: string; ckb: string; female?: boolean; parent?: string };
+const sampleFamily: Person[][] = [
+  [{ key: "a1", en: "Mam Rasul", ckb: "مام ڕەسووڵ" }, { key: "a2", en: "Khanzad", ckb: "خانزاد", female: true }],
+  [{ key: "b1", en: "Mahmud", ckb: "مەحموود", parent: "a" }, { key: "b2", en: "Gulbahar", ckb: "گوڵبەهار", female: true, parent: "a" }, { key: "b3", en: "Qadir", ckb: "قادر", parent: "a" }],
+  [{ key: "c1", en: "Aziz", ckb: "عەزیز", parent: "b1" }, { key: "c2", en: "Fatima", ckb: "فاتیمە", female: true, parent: "b1" }, { key: "c3", en: "Osman", ckb: "عوسمان", parent: "b3" }, { key: "c4", en: "Zarifa", ckb: "زەریفە", female: true, parent: "b3" }],
+  [{ key: "d1", en: "Salih", ckb: "ساڵح", parent: "c1" }, { key: "d2", en: "Nergiz", ckb: "نێرگز", female: true, parent: "c1" }, { key: "d3", en: "Karim", ckb: "کەریم", parent: "c3" }, { key: "d4", en: "Amina", ckb: "ئامینە", female: true, parent: "c4" }],
+  [{ key: "e1", en: "Mustafa", ckb: "مستەفا", parent: "d1" }, { key: "e2", en: "Shirin", ckb: "شیرین", female: true, parent: "d1" }, { key: "e3", en: "Ahmad", ckb: "ئەحمەد", parent: "d3" }, { key: "e4", en: "Peri", ckb: "پەری", female: true, parent: "d4" }],
+  [{ key: "f1", en: "Jalal", ckb: "جەلال", parent: "e1" }, { key: "f2", en: "Pakhshan", ckb: "پەخشان", female: true, parent: "e1" }, { key: "f3", en: "Rauf", ckb: "ڕەئووف", parent: "e3" }, { key: "f4", en: "Bahar", ckb: "بەهار", female: true, parent: "e4" }],
+  [{ key: "g1", en: "Kawa", ckb: "کاوە", parent: "f1" }, { key: "g2", en: "Nasrin", ckb: "نەسرین", female: true, parent: "f1" }, { key: "g3", en: "Soran", ckb: "سۆران", parent: "f3" }],
+];
+type Node = { key: string; x: number; y: number; name: string; female: boolean; row: number; parent?: string };
 
-/** A small three-generation slice of the real tree, starting from the root with the most descendants. */
-function usePreview(archive: Archive, language: Language, t: Translate) {
-  return useMemo(() => {
-    const { members, parents, partners } = archive;
-    const byId = new Map(members.map(member => [member.id, member]));
-    const childrenOf = (id: string) => parents.filter(edge => edge.parent_id === id && byId.has(edge.child_id)).map(edge => edge.child_id);
-    const countDescendants = (id: string, seen = new Set<string>()): number => {
-      if (seen.has(id)) return 0;
-      seen.add(id);
-      return childrenOf(id).reduce((total, child) => total + 1 + countDescendants(child, seen), 0);
-    };
-    const year = (member?: Member) => member?.birth_year ?? 9999;
-    const roots = members.filter(member => !parents.some(edge => edge.child_id === member.id && byId.has(edge.parent_id)));
-    const root = [...roots].sort((a, b) => countDescendants(b.id) - countDescendants(a.id) || year(a) - year(b))[0];
-    const node = (member: Member, x: number, row: number): Node =>
-      ({ key: member.id, x, y: [16, 50, 84][row], row, name: memberName(member, language), photo: member.photo_path ? photoUrl(member.photo_path) : null });
-    if (!root || members.length < 2) {
-      // Illustration for an empty archive
-      const sample = (key: string, x: number, row: number, label: string): Node => ({ key, x, y: [16, 50, 84][row], row, name: label, photo: null });
-      const nodes = [sample("g1", 40, 0, t("sampleGrandparents")), sample("g2", 60, 0, t("sampleGrandparents")),
-        sample("p1", 28, 1, t("sampleParents")), sample("p2", 72, 1, t("sampleParents")),
-        sample("c1", 16, 2, t("sampleChildren")), sample("c2", 40, 2, t("sampleChildren")), sample("c3", 72, 2, t("sampleChildren"))];
-      return { sample: true, nodes, links: [["g1", "p1"], ["g2", "p2"], ["p1", "c1"], ["p1", "c2"], ["p2", "c3"]] as [string, string][], couple: ["g1", "g2"] as [string, string] };
-    }
-    const partnerId = partners.map(edge => edge.first_id === root.id ? edge.second_id : edge.second_id === root.id ? edge.first_id : null)
-      .find(id => id && byId.has(id) && !childrenOf(root.id).includes(id)) ?? null;
-    const partner = partnerId ? byId.get(partnerId) : undefined;
-    const kids = [...new Set([...childrenOf(root.id), ...(partner ? childrenOf(partner.id) : [])])]
-      .map(id => byId.get(id)!).sort((a, b) => year(a) - year(b)).slice(0, 4);
-    const nodes: Node[] = partner ? [node(root, 42, 0), node(partner, 58, 0)] : [node(root, 50, 0)];
-    const links: [string, string][] = [];
-    const spread = (count: number, index: number, from = 10, to = 90) => count === 1 ? (from + to) / 2 : from + (to - from) * index / (count - 1);
-    kids.forEach((kid, index) => {
-      nodes.push(node(kid, spread(kids.length, index), 1));
-      links.push([root.id, kid.id]);
-    });
-    const grandkids = kids.flatMap(kid => childrenOf(kid.id).slice(0, 2).map(id => [kid, byId.get(id)!] as const)).slice(0, 5);
-    grandkids.forEach(([kid, grandkid], index) => {
-      nodes.push(node(grandkid, spread(grandkids.length, index, 8, 92), 2));
-      links.push([kid.id, grandkid.id]);
-    });
-    return { sample: false, nodes, links, couple: partner ? [root.id, partner.id] as [string, string] : null };
-  }, [archive, language, t]);
-}
-
-function TreePreview({ archive, language, t, go }: Pick<Props, "archive" | "language" | "t" | "go">) {
-  const { sample, nodes, links, couple } = usePreview(archive, language, t);
+function TreePreview({ language, t, go }: Pick<Props, "language" | "t" | "go">) {
+  const rows = sampleFamily.length;
+  const nodes: Node[] = sampleFamily.flatMap((row, r) => row.map((person, i) => ({
+    key: person.key, row: r, parent: person.parent, female: Boolean(person.female),
+    name: language === "ckb" ? person.ckb : person.en,
+    // Leave room on the start side for the generation numbers.
+    x: r === 0 ? [40, 70][i] : row.length === 1 ? 55 : 18 + 74 * i / (row.length - 1),
+    y: 7 + 86 * r / (rows - 1),
+  })));
   const at = new Map(nodes.map(item => [item.key, item]));
-  const visibleLinks = links.filter(([from, to]) => at.has(from) && at.has(to));
-  const rows = new Set(nodes.map(item => item.row)).size;
-  // Draw branches in real pixels so strokes stay even and the draw-in animation works.
+  // Branches are drawn in real pixels so strokes stay even and the draw-in animation works.
   const box = useRef<HTMLButtonElement>(null);
-  const [size, setSize] = useState({ w: 1000, h: 430 });
+  const [size, setSize] = useState({ w: 1000, h: 620 });
   useEffect(() => {
     const element = box.current;
     if (!element) return;
@@ -105,20 +76,24 @@ function TreePreview({ archive, language, t, go }: Pick<Props, "archive" | "lang
     return () => observer.disconnect();
   }, []);
   const px = (x: number) => x * size.w / 100, py = (y: number) => y * size.h / 100;
-  return <button ref={box} className={"tree-preview rows-" + rows + (sample ? " sample" : "")} onClick={() => go("tree")} aria-label={t("exploreTree")}>
+  const couple = [at.get("a1")!, at.get("a2")!];
+  const rowDelay = (row: number) => 0.15 + row * 0.22;
+  return <button ref={box} className="tree-preview sample-tree" onClick={() => go("tree")} aria-label={t("exploreTree")}>
     <svg className="tree-preview-links" viewBox={`0 0 ${size.w} ${size.h}`} aria-hidden="true">
-      {couple && at.get(couple[0]) && at.get(couple[1]) && <path className="couple" pathLength={1}
-        d={`M ${px(at.get(couple[0])!.x)} ${py(at.get(couple[0])!.y)} H ${px(at.get(couple[1])!.x)}`} />}
-      {visibleLinks.map(([from, to], index) => {
-        const a = at.get(from)!, b = at.get(to)!;
-        const startX = px(couple && from === couple[0] ? 50 : a.x), endX = px(b.x);
-        const startY = py(a.y) + 16, endY = py(b.y) - 16, mid = (startY + endY) / 2;
-        return <path key={from + to} pathLength={1} style={{ transitionDelay: 0.25 + index * 0.08 + "s" }}
+      <path className="couple" pathLength={1} style={{ transitionDelay: "0.1s" }} d={`M ${px(couple[0].x)} ${py(couple[0].y)} H ${px(couple[1].x)}`} />
+      {nodes.filter(item => item.parent).map(item => {
+        const from = item.parent === "a" ? { x: (couple[0].x + couple[1].x) / 2, y: couple[0].y } : at.get(item.parent!)!;
+        const startX = px(from.x), endX = px(item.x), startY = py(from.y) + 15, endY = py(item.y) - 15, mid = (startY + endY) / 2;
+        return <path key={item.key} pathLength={1} style={{ transitionDelay: rowDelay(item.row) - 0.1 + "s" }}
           d={`M ${startX} ${startY} C ${startX} ${mid}, ${endX} ${mid}, ${endX} ${endY}`} />;
       })}
     </svg>
-    {nodes.map((item, index) => <span key={item.key} className={"tree-chip row-" + item.row} style={{ left: item.x + "%", top: item.y + "%", transitionDelay: 0.1 + index * 0.07 + "s" }}>
-      {item.photo ? <img src={item.photo} alt="" loading="lazy" /> : <span className="chip-initial" aria-hidden="true">{sample ? "" : Array.from(item.name)[0]}</span>}
+    {sampleFamily.map((_, r) => <span key={r} className="generation-mark" style={{ top: 7 + 86 * r / (rows - 1) + "%", transitionDelay: rowDelay(r) + "s" }}>
+      {(r + 1).toLocaleString(language === "ckb" ? "ar-IQ" : "en-GB")}
+    </span>)}
+    {nodes.map(item => <span key={item.key} className={"tree-chip row-" + Math.min(item.row, 2) + (item.female ? " female" : "")}
+      style={{ left: item.x + "%", top: item.y + "%", transitionDelay: rowDelay(item.row) + "s" }}>
+      <span className="chip-initial" aria-hidden="true">{Array.from(item.name)[0]}</span>
       <span className="chip-name" dir="auto">{item.name}</span>
     </span>)}
   </button>;
@@ -225,7 +200,7 @@ export default function Home({ archive, language, t, go, openEntry, contribute }
     <section className="home-section tree-section" data-reveal>
       <SectionHead eyebrow={t("familyTree")} title={t("treeTitle")} action={<button className="outline" onClick={() => go("tree")}>{t("exploreTree")}</button>} />
       <p className="hint">{t("treeBody")}</p>
-      <TreePreview archive={archive} language={language} t={t} go={go} />
+      <TreePreview language={language} t={t} go={go} />
     </section>
 
     <section className="home-section photos-section" data-reveal>

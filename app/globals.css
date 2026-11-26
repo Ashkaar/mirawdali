@@ -666,3 +666,22 @@ footer { align-items: center; }
 @media(max-width: 460px) {
   .steps { grid-template-columns: 1fr; }
 }
+
+/* Seven-generation sample tree */
+.tree-preview.sample-tree { aspect-ratio: 1.55; }
+.generation-mark {
+  position: absolute; inset-inline-start: 2.5%; transform: translateY(-50%); display: grid; place-items: center;
+  width: 26px; height: 26px; border-radius: 50%; background: var(--panel); border: 1px solid var(--line);
+  color: var(--muted); font: 600 .75rem/1 system-ui, sans-serif; transition: opacity .5s ease;
+}
+[dir="rtl"] .tree-preview .generation-mark { inset-inline-start: auto; left: 2.5%; }
+.tree-chip.female .chip-initial { background: #efd8e1; color: #71334b; }
+.reveal-ready [data-reveal]:not(.is-visible) .generation-mark { opacity: 0; }
+@media(max-width: 700px) {
+  .tree-preview.sample-tree { aspect-ratio: .78; }
+  .generation-mark { width: 20px; height: 20px; font-size: .625rem; inset-inline-start: 1.5%; }
+  .sample-tree .generation-mark { display: none; }
+  .sample-tree .tree-chip { max-width: 24%; padding: 5px 9px; font-size: .7rem; }
+  .sample-tree .tree-chip.row-0 { max-width: 30%; font-size: .78rem; padding: 6px 11px; }
+  .sample-tree .chip-initial { display: none; }
+}
