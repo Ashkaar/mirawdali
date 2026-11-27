@@ -197,3 +197,6 @@ Object.assign(production.ckb, {
   guide_install_3:"پاشان ئایکۆنی میراودەلی لەگەڵ ئەپەکانی ترتدا دەردەکەوێت.",
   guide_help:"یارمەتیت دەوێت؟", guide_help_intro:"ئەگەر شتێک کار ناکات یان پرسیارێکت هەیە، لە ڕێی پێشنیاری ڕاستکردنەوەی شەجەرەوە بینێرە و بەڕێوەبەرانی ئەرشیف وەڵامت دەدەنەوە.",
 });
+
+Object.assign(production.en, { privacyGoogle:"If you sign in with Google, the site receives only your name, email address and profile photo from Google. They are used to show your account and are never shared." });
+Object.assign(production.ckb, { privacyGoogle:"ئەگەر بە گووگڵ بچیتە ژوورەوە، ماڵپەڕەکە تەنها ناو و ئیمەیڵ و وێنەی پرۆفایلەکەت لە گووگڵەوە وەردەگرێت. تەنها بۆ پیشاندانی هەژمارەکەت بەکاردێن و هەرگیز هاوبەش ناکرێن." });

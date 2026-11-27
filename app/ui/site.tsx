@@ -184,7 +184,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
   }
 
   function renderPanel(active: Panel): { title: string; content: ReactNode } {
-    if (active.type === "privacy") return {title:t("privacy"),content:<p>{t("privacyBody")}</p>};
+    if (active.type === "privacy") return {title:t("privacy"),content:<><p>{t("privacyBody")}</p><p>{t("privacyGoogle")}</p></>};
     if (active.type === "account") return {
       title:t("account"),
       content: !archive.configured ? <p>{t("unavailable")}</p> : archive.signedIn ? <div className="choices">
