@@ -4,7 +4,7 @@ import { useEffect, type ReactNode } from "react";
 import type { Kind } from "@/lib/model";
 import type { Translate } from "./copy";
 
-type View = "home" | "tree" | "gallery" | "blog";
+type View = "home" | "tree" | "gallery" | "blog" | "howto";
 const icon = (children: ReactNode) => <svg className="home-icon" viewBox="0 0 24 24" aria-hidden="true">{children}</svg>;
 
 /** Step-by-step guides to using the archive. Each guide has a title, an intro and numbered steps from the copy file. */

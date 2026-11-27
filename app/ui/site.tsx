@@ -12,10 +12,11 @@ import Home from "./home";
 import HowTo from "./howto";
 
 const views = ["home","tree","gallery","blog","howto"] as const;
-const tabs = ["home","tree","gallery","blog"] as const;
+const tabs = ["home","tree","gallery","blog","howto"] as const;
 const categories = ["memories","history","news"] as const;
 const tabIcons: Record<string, ReactNode> = {
   home: <><path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h4.5v-5.5h3V20H18V9.5"/></>,
+  howto: <><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6"/><path d="M12 17.2v.1"/></>,
   tree: <><circle cx="12" cy="5" r="2.5"/><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M12 7.5V12M6 16.5V12h12v4.5"/></>,
   gallery: <><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5.5-5 4 3.5 3-2.5L21 18"/></>,
   blog: <><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h7"/></>,
@@ -73,6 +74,16 @@ function AccountMenu({ profile, children, label }: { profile: Profile; children:
     </button>
     {open && <div className="menu" role="menu" onClick={() => setOpen(false)}>{children}</div>}
   </div>;
+}
+
+/** Google's standard multicolour "G", used on the sign-in button as Google's branding guidelines require. */
+function GoogleLogo() {
+  return <svg className="google-logo" viewBox="0 0 48 48" aria-hidden="true">
+    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+  </svg>;
 }
 
 const categoryOptions = (t: Translate) => categories.map(key => <option key={key} value={key}>{t(key)}</option>);
@@ -183,18 +194,52 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
       <option key={item.id} value={item.id}>{memberName(item,language)}</option>);
   }
 
+  function authView(mode: AuthMode): ReactNode {
+    const afterAuth = (result: Result) => {
+      if (result.success === "signedIn" && nextContribution.current) {
+        open(nextContribution.current);
+        nextContribution.current = null;
+      } else if (result.success === "signedIn" || result.success === "passwordUpdated") closeWithToast(result);
+    };
+    const emailForm = <form className="auth-form" onSubmit={event => perform(event,authAction,afterAuth)}>
+      <input type="hidden" name="mode" value={mode} />
+      {mode === "signup" && <label>{t("firstName")}<input name="first_name" dir="auto" maxLength={40} required autoComplete="given-name" /></label>}
+      {mode !== "newPassword" && <label>{t("email")}<input type="email" name="email" autoComplete="email" maxLength={254} required /></label>}
+      {mode !== "reset" && <label><span className="label-row">{t("secret")}
+          {mode === "login" && <button type="button" className="plain" onClick={() => open({type:"auth",mode:"reset"})}>{t("forgotPassword")}</button>}</span>
+        <input type="password" name="password" autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={mode === "login" ? undefined : 8} maxLength={100} required />
+        {mode !== "login" && <small>{t("passwordHint")}</small>}</label>}
+      <button className="primary auth-submit" disabled={busy}>{t(mode === "reset" ? "sendResetLink" : mode)}</button>
+    </form>;
+    if (mode === "reset" || mode === "newPassword") return <div className="auth">
+      <p className="hint">{t(mode === "reset" ? "resetHint" : "newPasswordHint")}</p>
+      {emailForm}
+      {mode === "reset" && <button className="plain auth-back" onClick={() => open({type:"auth",mode:"login"})}>← {t("backToSignIn")}</button>}
+    </div>;
+    return <div className="auth">
+      <div className="auth-brand"><img src="/logo.svg" alt="" width={48} height={48} />
+        <div><strong>{t("title")}</strong><span>{t(mode === "signup" ? "signupSubtitle" : "loginSubtitle")}</span></div></div>
+      <div className="auth-tabs" role="tablist">
+        {(["login","signup"] as const).map(tab => <button key={tab} role="tab" aria-selected={mode === tab} onClick={() => open({type:"auth",mode:tab})}>{t(tab)}</button>)}
+      </div>
+      <form action={async data => { const result = await authAction(data); setMessage(result); }}>
+        <input type="hidden" name="mode" value="google" />
+        <button className="google-button"><GoogleLogo /><span>{t(mode === "signup" ? "googleSignup" : "googleLogin")}</span></button>
+      </form>
+      <div className="auth-divider"><span>{t("or")}</span></div>
+      {emailForm}
+      <p className="auth-foot">{t("newHere")} <button className="plain" onClick={() => { open(null); go("howto"); }}>{t("seeHowItWorks")}</button></p>
+    </div>;
+  }
+
   function renderPanel(active: Panel): { title: string; content: ReactNode } {
     if (active.type === "privacy") return {title:t("privacy"),content:<><p>{t("privacyBody")}</p><p>{t("privacyGoogle")}</p></>};
     if (active.type === "account") return {
-      title:t("account"),
-      content: !archive.configured ? <p>{t("unavailable")}</p> : archive.signedIn ? <div className="choices">
+      title:t(archive.signedIn ? "account" : "login"),
+      content: !archive.configured ? <p>{t("unavailable")}</p> : !archive.signedIn ? authView("login") : <div className="choices">
         {archive.admin && <a className="primary" href="/admin">{t("manage")}</a>}
         <button className="outline" onClick={() => open({type:"submissions"})}>{t("status")}</button>
         <form onSubmit={event => perform(event,authAction,closeWithToast)}><input type="hidden" name="mode" value="logout" /><button className="outline" disabled={busy}>{t("logout")}</button></form>
-      </div> : <div className="choices">
-        <button className="primary" onClick={() => open({type:"auth",mode:"login"})}>{t("login")}</button>
-        <button className="outline" onClick={() => open({type:"auth",mode:"signup"})}>{t("signup")}</button>
-        <form action={async data => { const result = await authAction(data); setMessage(result); }}><input type="hidden" name="mode" value="google" /><button className="outline">{t("google")}</button></form>
       </div>
     };
     if (active.type === "profile") {
@@ -207,23 +252,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
         <button className="primary" disabled={busy}>{t("save")}</button>
       </form>};
     }
-    if (active.type === "auth") return {
-      title:t(active.mode),
-      content:<form onSubmit={event => perform(event,authAction,result => {
-        if (result.success === "signedIn" && nextContribution.current) {
-          open(nextContribution.current);
-          nextContribution.current = null;
-        } else if (result.success === "signedIn" || result.success === "passwordUpdated") closeWithToast(result);
-      })}>
-        <input type="hidden" name="mode" value={active.mode} />
-        {active.mode === "signup" && <label>{t("firstName")}<input name="first_name" dir="auto" maxLength={40} required autoComplete="given-name" /></label>}
-        {active.mode !== "newPassword" && <label>{t("email")}<input type="email" name="email" autoComplete="email" maxLength={254} required /></label>}
-        {active.mode !== "reset" && <label>{t("secret")}<input type="password" name="password" autoComplete={active.mode === "login" ? "current-password" : "new-password"} minLength={active.mode === "login" ? undefined : 8} maxLength={100} required /></label>}
-        <div className="choices"><button className="primary" disabled={busy}>{t(active.mode)}</button>
-          {active.mode === "login" && <button type="button" className="plain" onClick={() => open({type:"auth",mode:"reset"})}>{t("reset")}</button>}
-          <button type="button" className="plain" onClick={() => open({type:"account"})}>{t("back")}</button></div>
-      </form>
-    };
+    if (active.type === "auth") return { title:t(active.mode), content: authView(active.mode) };
     if (active.type === "contribute") return {
       title:t(actionLabel[active.kind]),
       content:<form onSubmit={event => perform(event,submitContribution,closeWithToast)}>
@@ -234,6 +263,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
         {active.kind === "photo" && <label>{t("selectFile")}<input type="file" name="image" accept="image/jpeg,image/png,image/webp" required /><small>{t("photoLimit")}</small></label>}
         <label>{t(active.kind === "photo" ? "description" : "details")}<textarea name="body" maxLength={12000} required={active.kind !== "photo"} /></label>
         <button className="primary" disabled={busy}>{t("send")}</button>
+        <p className="hint form-help">{t("notSure")} <button type="button" className="plain" onClick={() => { open(null); go("howto"); }}>{t("readGuide")}</button></p>
       </form>
     };
     if (active.type === "entry") return {

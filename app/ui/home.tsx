@@ -5,7 +5,7 @@ import type { Archive, Contribution, Kind } from "@/lib/model";
 import type { Language, Translate } from "./copy";
 import { memberName, photoUrl } from "./tree";
 
-type View = "home" | "tree" | "gallery" | "blog";
+type View = "home" | "tree" | "gallery" | "blog" | "howto";
 type Props = {
   archive: Archive; language: Language; t: Translate;
   go: (view: View) => void; openEntry: (entry: Contribution) => void; contribute: (kind: Kind) => void;
@@ -95,57 +95,19 @@ function TreePreview({ language, t, go }: Pick<Props, "language" | "t" | "go">) 
   </button>;
 }
 
-function PhotoCarousel({ photos, t, openEntry }: { photos: Contribution[]; t: Translate; openEntry: (entry: Contribution) => void }) {
-  const track = useRef<HTMLDivElement>(null);
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const show = (next: number) => {
-    const slide = track.current?.children[(next + photos.length) % photos.length] as HTMLElement | undefined;
-    slide?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-  };
-  // Track which slide is centred as the visitor swipes or the carousel advances.
-  useEffect(() => {
-    const element = track.current;
-    if (!element) return;
-    const update = () => {
-      const centre = element.getBoundingClientRect().left + element.clientWidth / 2;
-      let best = 0, bestDistance = Infinity;
-      Array.from(element.children).forEach((child, i) => {
-        const box = child.getBoundingClientRect();
-        const distance = Math.abs(box.left + box.width / 2 - centre);
-        if (distance < bestDistance) { best = i; bestDistance = distance; }
-      });
-      setIndex(best);
-    };
-    element.addEventListener("scroll", update, { passive: true });
-    return () => element.removeEventListener("scroll", update);
-  }, []);
-  useEffect(() => {
-    const element = track.current;
-    if (!element) return;
-    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), { threshold: 0.5 });
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-  // Gentle auto-advance while on screen, unless paused or the visitor prefers less motion.
-  useEffect(() => {
-    if (!visible || paused || photos.length < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const timer = window.setInterval(() => show(index + 1), 5000);
-    return () => window.clearInterval(timer);
-  });
-  return <div className="carousel" onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)} onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}>
-    <div className="carousel-track" ref={track}>
-      {photos.map(photo => <button key={photo.id} className="slide" onClick={() => openEntry(photo)}>
-        <span className="slide-frame">{photo.image_path && <img src={photoUrl(photo.image_path)} alt="" loading="lazy" />}</span>
-        <span className="slide-caption"><strong dir="auto">{photo.title}</strong>{photo.body && <small dir="auto">{photo.body}</small>}</span>
-      </button>)}
-    </div>
-    {photos.length > 1 && <div className="carousel-controls">
-      <button className="carousel-arrow" onClick={() => show(index - 1)} aria-label={t("previousPhoto")}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 6-6 6 6 6"/></svg></button>
-      <div className="carousel-dots">{photos.map((photo, i) => <button key={photo.id} aria-label={t("goToPhoto") + " " + (i + 1)} aria-current={i === index ? "true" : undefined} onClick={() => show(i)} />)}</div>
-      <button className="carousel-arrow" onClick={() => show(index + 1)} aria-label={t("nextPhoto")}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6"/></svg></button>
-    </div>}
+/** A strip of photos that glides continuously and loops; pauses on hover or touch. Static and scrollable with reduced motion. */
+function PhotoCarousel({ photos, openEntry }: { photos: Contribution[]; t: Translate; openEntry: (entry: Contribution) => void }) {
+  // Repeat short lists so the strip is always wider than the screen, then double it for a seamless loop.
+  const base: Contribution[] = [];
+  while (base.length < 8) base.push(...photos);
+  const strip = [...base, ...base];
+  const slide = (photo: Contribution, i: number) => <button key={photo.id + "-" + i} className="slide" onClick={() => openEntry(photo)}
+    aria-hidden={i >= photos.length ? "true" : undefined} tabIndex={i >= photos.length ? -1 : undefined}>
+    <span className="slide-frame">{photo.image_path && <img src={photoUrl(photo.image_path)} alt="" loading="lazy" />}</span>
+    <span className="slide-caption"><strong dir="auto">{photo.title}</strong></span>
+  </button>;
+  return <div className="marquee" dir="ltr">
+    <div className="marquee-track" style={{ animationDuration: base.length * 4.5 + "s" }}>{strip.map(slide)}</div>
   </div>;
 }
 
@@ -217,7 +179,7 @@ export default function Home({ archive, language, t, go, openEntry, contribute }
     </section>
 
     <section className="home-section how" data-reveal>
-      <SectionHead eyebrow={t("howEyebrow")} title={t("howTitle")} />
+      <SectionHead eyebrow={t("howEyebrow")} title={t("howTitle")} action={<button className="outline" onClick={() => go("howto")}>{t("readGuide")}</button>} />
       <ol className="steps">
         {steps.map(([glyph, title, body], i) => <li key={title} className="step" data-reveal style={{ transitionDelay: i * 0.1 + "s" }}>
           <span className="step-number">{i + 1}</span>{glyph}<strong>{title}</strong><p>{body}</p>

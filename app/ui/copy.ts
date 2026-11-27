@@ -200,3 +200,20 @@ Object.assign(production.ckb, {
 
 Object.assign(production.en, { privacyGoogle:"If you sign in with Google, the site receives only your name, email address and profile photo from Google. They are used to show your account and are never shared." });
 Object.assign(production.ckb, { privacyGoogle:"ئەگەر بە گووگڵ بچیتە ژوورەوە، ماڵپەڕەکە تەنها ناو و ئیمەیڵ و وێنەی پرۆفایلەکەت لە گووگڵەوە وەردەگرێت. تەنها بۆ پیشاندانی هەژمارەکەت بەکاردێن و هەرگیز هاوبەش ناکرێن." });
+
+Object.assign(production.en, {
+  loginSubtitle:"Welcome back. Sign in to share photos, stories and corrections.", signupSubtitle:"Join the family archive. It only takes a minute.",
+  googleLogin:"Sign in with Google", googleSignup:"Sign up with Google", or:"or", forgotPassword:"Forgot password?",
+  passwordHint:"At least 8 characters.", sendResetLink:"Send reset link", resetHint:"Enter your email address and we'll send you a link to choose a new password.",
+  newPasswordHint:"Choose a new password for your account.", backToSignIn:"Back to sign in", newHere:"New here?", seeHowItWorks:"See how it works",
+  notSure:"Not sure what to send?", readGuide:"Read the guide",
+  invalidRelationship:"Check the years and relationships. Someone can't be their own ancestor, or both a parent and a partner.",
+});
+Object.assign(production.ckb, {
+  loginSubtitle:"بەخێربێیتەوە. بچۆ ژوورەوە بۆ هاوبەشکردنی وێنە و چیرۆک و ڕاستکردنەوە.", signupSubtitle:"ببە بە بەشێک لە ئەرشیفی بنەماڵە. تەنها یەک خولەک دەخایەنێت.",
+  googleLogin:"چوونەژوورەوە بە گووگڵ", googleSignup:"خۆتۆمارکردن بە گووگڵ", or:"یان", forgotPassword:"وشەی نهێنیت لەبیرچووە؟",
+  passwordHint:"لانیکەم ٨ پیت.", sendResetLink:"ناردنی بەستەر", resetHint:"ئیمەیڵەکەت بنووسە و بەستەرێکت بۆ دەنێرین بۆ دانانی وشەی نهێنی نوێ.",
+  newPasswordHint:"وشەی نهێنییەکی نوێ بۆ هەژمارەکەت هەڵبژێرە.", backToSignIn:"گەڕانەوە بۆ چوونەژوورەوە", newHere:"نوێیت لێرە؟", seeHowItWorks:"ببینە چۆن کار دەکات",
+  notSure:"دڵنیا نیت چی بنێریت؟", readGuide:"ڕێنمایی بخوێنەوە",
+  invalidRelationship:"ساڵ و پەیوەندییەکان بپشکنە. کەس نابێت باپیری خۆی بێت، یان هەم دایک یان باوک و هەم هاوسەر بێت.",
+});
