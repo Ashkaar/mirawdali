@@ -19,10 +19,17 @@ export type Contribution = Submission & { body: string; category: Category | nul
 export type Roles = { owner: boolean; tree: boolean; gallery: boolean; blog: boolean };
 /** What the header shows for the signed-in user. `avatar` is a /media path or an https URL. */
 export type Profile = { firstName: string; avatar: string | null; avatarPath: string | null };
+/** Owner-edited home page text; null means use the built-in default. */
+export type About = { en: string | null; ckb: string | null };
+export const parseAbout = (value: unknown): About => {
+  const data = (value ?? {}) as Record<string, unknown>;
+  const read = (v: unknown) => typeof v === "string" && v.trim() ? v : null;
+  return { en: read(data.en), ckb: read(data.ckb) };
+};
 export type Archive = {
   configured: boolean; failed: boolean; publicRead: boolean; signedIn: boolean;
   /** True when the user can open the admin panel. */
-  admin: boolean; roles: Roles; profile: Profile | null;
+  admin: boolean; roles: Roles; profile: Profile | null; about: About;
   members: Member[]; parents: Parent[]; partners: Partner[]; published: Contribution[]; mine: Submission[];
 };
 

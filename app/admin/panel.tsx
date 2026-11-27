@@ -11,7 +11,7 @@ import PeoplePicker from "@/app/ui/people-picker";
 import PhotoCrop from "@/app/ui/photo-crop";
 import {
   deleteEntry, deleteMember, deleteUser, markSuggestionDone, publishEntry, saveMember, setEntryStatus,
-  setUserBlocked, setUserSections, setVisibility, updateEntry,
+  setAbout, setUserBlocked, setUserSections, setVisibility, updateEntry,
 } from "./actions";
 
 type Result = { error?: string; success?: string };
@@ -385,5 +385,12 @@ function SettingsTab({ data, t, busy, perform }: Shared) {
       <p className="hint">{t("ownerNote")}</p>
       <p className="hint">{t("rolesNote")}</p>
     </div>
+    <div className="admin-bar"><h2>{t("aboutTitle")}</h2></div>
+    <form className="admin-pad about-form" onSubmit={event => perform(event, setAbout)}>
+      <p className="hint">{t("aboutAdminHint")}</p>
+      <label>{t("aboutEnglish")}<textarea name="about_en" dir="ltr" lang="en" maxLength={4000} rows={6} defaultValue={data.about.en ?? ""} placeholder={translate("en")("aboutBody")} /></label>
+      <label>{t("aboutSorani")}<textarea name="about_ckb" dir="rtl" lang="ckb" maxLength={4000} rows={6} defaultValue={data.about.ckb ?? ""} placeholder={translate("ckb")("aboutBody")} /></label>
+      <div><button className="primary" disabled={busy}>{t("save")}</button></div>
+    </form>
   </section>;
 }

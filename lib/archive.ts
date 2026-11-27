@@ -1,5 +1,5 @@
 import { backendReady, database } from "@/lib/supabase";
-import { hasAnyRole, noRoles, parseRoles, type Archive, type Profile } from "@/lib/model";
+import { hasAnyRole, noRoles, parseAbout, parseRoles, type Archive, type Profile } from "@/lib/model";
 
 const storedPhoto = /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.webp$/;
 
@@ -19,7 +19,7 @@ export * from "@/lib/model";
 
 export async function loadArchive(): Promise<Archive> {
   const empty: Archive = {
-    configured: backendReady, failed: false, publicRead: true, signedIn: false, admin: false, roles: noRoles, profile: null,
+    configured: backendReady, failed: false, publicRead: true, signedIn: false, admin: false, roles: noRoles, profile: null, about: { en: null, ckb: null },
     members: [], parents: [], partners: [], published: [], mine: [],
   };
   if (!backendReady) return empty;
@@ -29,8 +29,9 @@ export async function loadArchive(): Promise<Archive> {
     const signedIn = Boolean(session.data?.claims.sub);
     const fields = "id,title,body,kind,status,category,image_path,member_id,created_at";
     // The account itself, not the device's sign-in token, so a name or photo changed on another device shows at once.
-    const [account, visibility, roles, members, parents, partners, published, mine] = await Promise.all([
+    const [account, about, visibility, roles, members, parents, partners, published, mine] = await Promise.all([
       signedIn ? db.auth.getUser() : null,
+      db.rpc("archive_about"),
       db.rpc("archive_is_public"),
       signedIn ? db.rpc("my_archive_roles") : { data: null, error: null },
       db.from("members").select("*").order("id"),
@@ -41,7 +42,7 @@ export async function loadArchive(): Promise<Archive> {
     ]);
     const parsedRoles = parseRoles(roles.data);
     return {
-      ...empty, signedIn, roles: parsedRoles, profile: signedIn ? profileFrom(account?.data.user ? { email: account.data.user.email, user_metadata: account.data.user.user_metadata } : session.data!.claims as Record<string, unknown>) : null, admin: hasAnyRole(parsedRoles), publicRead: visibility.data === true,
+      ...empty, signedIn, roles: parsedRoles, about: parseAbout(about.data), profile: signedIn ? profileFrom(account?.data.user ? { email: account.data.user.email, user_metadata: account.data.user.user_metadata } : session.data!.claims as Record<string, unknown>) : null, admin: hasAnyRole(parsedRoles), publicRead: visibility.data === true,
       failed: [visibility,roles,members,parents,partners,published,mine].some(result => Boolean(result.error)),
       members: members.data ?? [], parents: parents.data ?? [], partners: partners.data ?? [],
       published: published.data ?? [], mine: mine.data ?? [],

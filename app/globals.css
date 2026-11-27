@@ -688,3 +688,31 @@ footer { align-items: center; }
   .sample-tree .tree-chip.row-0 { max-width: 30%; font-size: .78rem; padding: 6px 11px; }
   .sample-tree .chip-initial { display: none; }
 }
+
+/* How to page */
+.howto-index { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin-top: 24px; }
+.howto-index a {
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; text-decoration: none;
+  color: var(--ink); font-weight: 600; font-size: .9375rem; background: var(--soft); border: 1px solid var(--line);
+  transition: border-color .2s, transform .2s;
+}
+.howto-index a:hover { border-color: var(--accent); transform: translateY(-2px); }
+.howto-index .home-icon { color: var(--accent); }
+.guide { scroll-margin-top: 16px; display: grid; gap: 16px; justify-items: start; }
+.guide-head { display: flex; gap: 16px; align-items: start; }
+.guide-head > .home-icon { width: 48px; height: 48px; padding: 11px; border-radius: 14px; background: var(--accent); color: var(--accent-text); }
+.guide-head h2 { margin: 0 0 4px; font-size: clamp(1.3rem, 2.4vw, 1.7rem); }
+.guide-steps { margin: 0; padding: 0; list-style: none; counter-reset: guide; display: grid; gap: 10px; width: 100%; }
+.guide-steps li {
+  counter-increment: guide; position: relative; padding: 12px 16px; padding-inline-start: 54px; border-radius: 12px;
+  background: var(--soft); line-height: 1.6;
+}
+.guide-steps li::before {
+  content: counter(guide); position: absolute; inset-inline-start: 14px; top: 11px; width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--panel); border: 1px solid var(--line); color: var(--accent); font-weight: 700; font-size: .875rem;
+}
+.footer-links { display: inline-flex; gap: 18px; flex-wrap: wrap; }
+.about-form { display: grid; gap: 12px; }
+.about-form label { display: grid; gap: 6px; font-weight: 600; }
+.about-form textarea { width: 100%; resize: vertical; line-height: 1.6; font-weight: 400; }
+.about-text { white-space: pre-line; }

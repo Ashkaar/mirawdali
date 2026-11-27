@@ -203,3 +203,13 @@ export async function setVisibility(form: FormData): Promise<Result> {
   const { error } = await ctx.db.rpc("set_archive_visibility", { visible_to_guests: text(form, "visibility") === "public" });
   return error ? failure(error) : ok("visibilitySaved");
 }
+
+export async function setAbout(form: FormData): Promise<Result> {
+  const ctx = await context("owner");
+  if (!ctx) return fail("ownerOnly");
+  const english = String(form.get("about_en") ?? "").trim();
+  const sorani = String(form.get("about_ckb") ?? "").trim();
+  if (english.length > 4000 || sorani.length > 4000) return fail("invalid");
+  const { error } = await ctx.db.rpc("set_archive_about", { english, sorani });
+  return error ? failure(error) : ok("aboutSaved");
+}

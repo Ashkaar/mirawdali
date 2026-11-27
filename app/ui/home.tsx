@@ -175,7 +175,7 @@ export default function Home({ archive, language, t, go, openEntry, contribute }
       <div className="about-copy">
         <p className="eyebrow">{t("aboutEyebrow")}</p>
         <h2>{t("aboutTitle")}</h2>
-        <p className="lead">{t("aboutBody")}</p>
+        <p className="lead about-text" dir="auto">{(language === "ckb" ? archive.about.ckb : archive.about.en) ?? t("aboutBody")}</p>
       </div>
       <dl className="about-stats">
         {stats.map(([value, label]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}

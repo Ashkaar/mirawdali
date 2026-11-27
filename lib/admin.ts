@@ -1,5 +1,5 @@
 import { backendReady, database } from "@/lib/supabase";
-import { hasAnyRole, parseRoles, type Category, type Kind, type Member, type Parent, type Partner, type Roles, type Status } from "@/lib/model";
+import { hasAnyRole, parseAbout, parseRoles, type About, type Category, type Kind, type Member, type Parent, type Partner, type Roles, type Status } from "@/lib/model";
 
 export type AdminEntry = {
   id: string; kind: Kind; status: Status; title: string; body: string; category: Category | null;
@@ -11,7 +11,7 @@ export type AdminUser = {
   confirmed: boolean; blocked: boolean; is_owner: boolean; sections: string[]; submissions: number;
 };
 export type AdminData = {
-  userId: string; roles: Roles; failed: boolean; publicRead: boolean;
+  userId: string; roles: Roles; failed: boolean; publicRead: boolean; about: About;
   members: Member[]; parents: Parent[]; partners: Partner[]; entries: AdminEntry[]; users: AdminUser[];
 };
 
@@ -26,7 +26,8 @@ export async function loadAdmin(): Promise<AdminData | null> {
   const roles = parseRoles(rolesResult.data);
   if (!hasAnyRole(roles)) return null;
   const none = { data: [], error: null };
-  const [visibility, members, parents, partners, entries, users] = await Promise.all([
+  const [about, visibility, members, parents, partners, entries, users] = await Promise.all([
+    db.rpc("archive_about"),
     db.rpc("archive_is_public"),
     db.from("members").select("*"),
     db.from("parents").select("*"),
@@ -35,7 +36,7 @@ export async function loadAdmin(): Promise<AdminData | null> {
     roles.owner ? db.rpc("admin_list_users") : none,
   ]);
   return {
-    userId, roles, publicRead: visibility.data === true,
+    userId, roles, publicRead: visibility.data === true, about: parseAbout(about.data),
     failed: [rolesResult, visibility, members, parents, partners, entries, users].some(result => Boolean(result.error)),
     members: members.data ?? [], parents: parents.data ?? [], partners: partners.data ?? [],
     entries: (entries.data ?? []) as AdminEntry[], users: (users.data ?? []) as AdminUser[],

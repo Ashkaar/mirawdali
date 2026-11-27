@@ -9,8 +9,10 @@ import Tree, { memberName, photoUrl } from "./tree";
 import Preferences from "./preferences";
 import PhotoCrop from "./photo-crop";
 import Home from "./home";
+import HowTo from "./howto";
 
-const views = ["home","tree","gallery","blog"] as const;
+const views = ["home","tree","gallery","blog","howto"] as const;
+const tabs = ["home","tree","gallery","blog"] as const;
 const categories = ["memories","history","news"] as const;
 const tabIcons: Record<string, ReactNode> = {
   home: <><path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h4.5v-5.5h3V20H18V9.5"/></>,
@@ -277,7 +279,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
       <p dir="auto">{entry.body.length > 180 ? entry.body.slice(0,180)+"…" : entry.body}</p>
     </button>;
   const navigation = (className: string) => <nav className={className} aria-label={language === "en" ? "Main navigation" : "ڕێنیشاندەری سەرەکی"}>
-    {views.map(tab => <button key={tab} onClick={() => go(tab)} aria-current={tab === view ? "page" : undefined}><svg className="tab-icon" viewBox="0 0 24 24" aria-hidden="true">{tabIcons[tab]}</svg><span>{t(tab)}</span></button>)}
+    {tabs.map(tab => <button key={tab} onClick={() => go(tab)} aria-current={tab === view ? "page" : undefined}><svg className="tab-icon" viewBox="0 0 24 24" aria-hidden="true">{tabIcons[tab]}</svg><span>{t(tab)}</span></button>)}
   </nav>;
   return <>
     <header className="masthead">
@@ -297,7 +299,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
         {archive.configured && !archive.failed && canBrowse && currentKind && <button className="primary" onClick={() => contribute(currentKind)}>{t(actionLabel[currentKind])}</button>}
       </section>
     </header>
-    <main>{archive.configured && !archive.failed && canBrowse && view === "home" ?
+    <main>{view === "howto" ? <HowTo t={t} go={go} contribute={kind => contribute(kind)} /> : archive.configured && !archive.failed && canBrowse && view === "home" ?
       <Home archive={archive} language={language} t={t} go={go} openEntry={entry => open({type:"entry",entry})} contribute={kind => contribute(kind)} /> :
       <section className="frame">
       {!archive.configured || archive.failed || !canBrowse ? <div className="bar"><div><h2>{t(view === "tree" ? "familyTree" : view)}</h2>
@@ -312,7 +314,7 @@ export default function Site({ archive, authResult }: { archive: Archive; authRe
         </>}
     </section>}</main>
     {navigation("tabs bottom-tabs")}
-    <footer><span className="footer-brand"><img src="/logo.svg" alt="" width={36} height={36} />Mirawdali · میراودەلی</span><button className="plain" onClick={() => open({type:"privacy"})}>{t("privacy")}</button></footer>
+    <footer><span className="footer-brand"><img src="/logo.svg" alt="" width={36} height={36} />Mirawdali · میراودەلی</span><span className="footer-links"><button className="plain" onClick={() => go("howto")}>{t("howTo")}</button><button className="plain" onClick={() => open({type:"privacy"})}>{t("privacy")}</button></span></footer>
     {currentPanel && <Dialog title={currentPanel.title} close={() => open(null)} t={t}>
       {currentPanel.content}
       {(message.error || message.success) && <p className="action-status" role={message.error ? "alert" : "status"}>{t(message.error ?? message.success ?? "")}</p>}
