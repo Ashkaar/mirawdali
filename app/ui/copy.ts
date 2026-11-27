@@ -217,3 +217,16 @@ Object.assign(production.ckb, {
   notSure:"دڵنیا نیت چی بنێریت؟", readGuide:"ڕێنمایی بخوێنەوە",
   invalidRelationship:"ساڵ و پەیوەندییەکان بپشکنە. کەس نابێت باپیری خۆی بێت، یان هەم دایک یان باوک و هەم هاوسەر بێت.",
 });
+
+Object.assign(production.en, {
+  familiesStat:"Families in the tribe, estimated",
+  statMembers:"Family members added to the tree", statMembersOne:"Family member added to the tree",
+  statPhotos:"Photos uploaded to the gallery", statPhotosOne:"Photo uploaded to the gallery",
+  statStories:"Stories shared on the blog", statStoriesOne:"Story shared on the blog",
+});
+Object.assign(production.ckb, {
+  familiesStat:"خێزانی هۆزەکە، بە مەزەندە",
+  statMembers:"ئەندام زیادکراون بۆ شەجەرەکە", statMembersOne:"ئەندام زیادکراوە بۆ شەجەرەکە",
+  statPhotos:"وێنە بارکراون بۆ گالەری", statPhotosOne:"وێنە بارکراوە بۆ گالەری",
+  statStories:"چیرۆک هاوبەشکراون لە بلۆگ", statStoriesOne:"چیرۆک هاوبەشکراوە لە بلۆگ",
+});

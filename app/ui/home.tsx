@@ -120,11 +120,13 @@ export default function Home({ archive, language, t, go, openEntry, contribute }
   const photos = archive.published.filter(item => item.kind === "photo").slice(0, 12);
   const posts = archive.published.filter(item => item.kind === "post").slice(0, 6);
   const number = (value: number) => value.toLocaleString(language === "ckb" ? "ckb-IQ" : "en-GB");
+  // Archive counts use the full published lists (the carousel and story grid show only the latest few).
+  const count = (key: string, value: number) => [number(value), t(value === 1 ? key + "One" : key)] as [string, string];
   const stats: [string, string][] = [
     [t("familiesValue"), t("familiesStat")],
-    [number(archive.members.length), t("membersCount")],
-    [number(photos.length), t("photosCount")],
-    [number(posts.length), t("postsCount")],
+    count("statMembers", archive.members.length),
+    count("statPhotos", archive.published.filter(item => item.kind === "photo").length),
+    count("statStories", archive.published.filter(item => item.kind === "post").length),
   ];
   const steps: [ReactNode, string, string][] = [
     [icons.explore, t("step1Title"), t("step1Body")],
