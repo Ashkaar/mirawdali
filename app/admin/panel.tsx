@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import type { AdminData, AdminEntry, AdminUser } from "@/lib/admin";
-import { categoryKeys, sectionKeys, type Kind, type Member, type Section, type Status } from "@/lib/model";
+import { categoryKeys, sectionKeys, visibilityKeys, type Kind, type Member, type Section, type Status, type Visibility } from "@/lib/model";
 import { translate, type Language, type Translate } from "@/app/ui/copy";
 import { memberName, photoUrl } from "@/app/ui/tree";
 import Preferences from "@/app/ui/preferences";
@@ -28,6 +28,19 @@ const labelFor = (status: Status, kind: Kind) => kind === "suggestion" && status
 const formatDate = (value: string | null, language: Language, t: Translate) => value
   ? new Date(value).toLocaleDateString(language === "ckb" ? "ckb-IQ" : "en-GB", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" })
   : t("never");
+
+/** "Who can see this" selector. Only the owner can choose Only me. */
+function VisibilitySelect({ value, owner, t }: { value?: Visibility; owner: boolean; t: Translate }) {
+  const [current, setCurrent] = useState<Visibility>(value ?? "public");
+  return <label>{t("whoCanSee")}
+    <select name="visibility" value={current} onChange={event => setCurrent(event.target.value as Visibility)}>
+      {visibilityKeys.filter(key => owner || key !== "private" || value === "private").map(key => <option key={key} value={key}>{t("vis_" + key)}</option>)}
+    </select>
+    <small>{t("vis_" + current + "_hint")}</small>
+  </label>;
+}
+const VisibilityBadge = ({ value, t }: { value?: Visibility; t: Translate }) => value && value !== "public"
+  ? <span className={"badge vis-" + value}>{value === "private" ? "🔒 " : ""}{t("vis_" + value + "_short")}</span> : null;
 
 function Modal({ title, close, children, t }: { title: string; close: () => void; children: ReactNode; t: Translate }) {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -220,7 +233,7 @@ function TreeTab(props: Shared) {
           return <tr key={member.id}>
             <td><div className="who">
               {member.photo_path ? <img className="initial" src={photoUrl(member.photo_path)} alt="" loading="lazy" /> : <span className="initial" aria-hidden="true">{Array.from(memberName(member, language))[0]}</span>}
-              <span><strong>{memberName(member, language)}</strong><small>{[language === "ckb" ? member.name_en : member.name_ckb, t(member.gender)].filter(Boolean).join(" · ")}</small></span>
+              <span><strong>{memberName(member, language)} <VisibilityBadge value={member.visibility} t={t} /></strong><small>{[language === "ckb" ? member.name_en : member.name_ckb, t(member.gender)].filter(Boolean).join(" · ")}</small></span>
             </div></td>
             <td data-label={t("years")}>{[member.birth_year, member.death_year].filter(Boolean).join(" – ") || "—"}</td>
             <td data-label={t("parent")}>{parents.join(", ") || "—"}</td>
@@ -265,6 +278,7 @@ function EntryList({ data, t, language, busy, perform, open, nameOf, kind }: Sha
         <div className="admin-item-body">
           <p className="meta">
             <span className={"badge " + entry.status}>{t(labelFor(entry.status, kind))}</span>
+            {kind !== "suggestion" && <VisibilityBadge value={entry.visibility} t={t} />}
             {entry.category && <span>{t(entry.category)}</span>}
             {entry.member_id && <span>{nameOf(entry.member_id)}</span>}
             {entry.applied_at && <span>{t("applied")}</span>}
@@ -300,6 +314,7 @@ function MemberForm({ data, t, language, busy, perform, member, suggestion }: Sh
     {suggestion && <div className="review-item"><input type="hidden" name="suggestion" value={suggestion.id} /><strong>{suggestion.title}</strong><p className="entry-body">{suggestion.body}</p></div>}
     <label>{t("englishName")}<input name="name_en" dir="auto" maxLength={140} defaultValue={member?.name_en ?? ""} /></label>
     <label>{t("soraniName")}<input name="name_ckb" dir="auto" maxLength={140} defaultValue={member?.name_ckb ?? ""} /></label>
+    <VisibilitySelect value={member?.visibility} owner={data.roles.owner} t={t} />
     <label>{t("gender")}<select name="gender" defaultValue={member?.gender ?? "unspecified"}>{genders.map(key => <option key={key} value={key}>{t(key)}</option>)}</select></label>
     <div className="form-row">
       <label>{t("birthYear")}<input name="birth_year" type="number" min={1} max={9999} defaultValue={member?.birth_year ?? ""} /></label>
@@ -315,13 +330,14 @@ function MemberForm({ data, t, language, busy, perform, member, suggestion }: Sh
   </form>;
 }
 
-function EntryForm({ t, busy, perform, kind, entry }: Shared & { kind: "post" | "photo"; entry?: AdminEntry }) {
+function EntryForm({ data, t, busy, perform, kind, entry }: Shared & { kind: "post" | "photo"; entry?: AdminEntry }) {
   return <form onSubmit={event => perform(event, entry ? updateEntry : publishEntry)}>
     <input type="hidden" name="kind" value={kind} />
     <input type="hidden" name="section" value={sectionOf(kind)} />
     <input type="hidden" name="id" value={entry?.id ?? ""} />
     {entry?.image_path && <img className="gallery-image" src={photoUrl(entry.image_path)} alt="" />}
     <label>{t("postTitle")}<input name="title" maxLength={150} required defaultValue={entry?.title ?? ""} /></label>
+    <VisibilitySelect value={entry?.visibility} owner={data.roles.owner} t={t} />
     {kind === "post" && <label>{t("category")}<select name="category" defaultValue={entry?.category ?? "memories"}>{categoryKeys.map(key => <option key={key} value={key}>{t(key)}</option>)}</select></label>}
     {kind === "photo" && !entry && <label>{t("selectFile")}<input type="file" name="image" accept="image/jpeg,image/png,image/webp" required /><small>{t("photoLimit")}</small></label>}
     <label>{t(kind === "photo" ? "description" : "details")}<textarea name="body" maxLength={12000} required={kind === "post"} defaultValue={entry?.body ?? ""} /></label>

@@ -760,3 +760,9 @@ footer { align-items: center; }
 .form-help { margin: 4px 0 0; }
 @media(max-width: 700px) { .bottom-tabs button { padding-inline: 2px; } }
 .tree-links .second-parent-link { stroke-dasharray: 3 4; opacity: .6; }
+
+/* Visibility badges */
+.badge.vis-users { background: #dfe6f3; color: #24406f; border-color: #c1cde4; }
+.badge.vis-private { background: #2a1f24; color: #f5e9ee; border-color: #2a1f24; }
+:root[data-theme="dark"] .badge.vis-private { background: #f5e9ee; color: #2a1f24; }
+.who strong .badge { margin-inline-start: 6px; vertical-align: middle; font-weight: 700; }

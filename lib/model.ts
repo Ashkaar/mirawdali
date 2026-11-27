@@ -3,13 +3,16 @@
 export const categoryKeys = ["memories","history","news"] as const;
 export const sectionKeys = ["tree","gallery","blog"] as const;
 export type Category = typeof categoryKeys[number];
+/** Who can see an item: anyone, signed-in accounts, or the owner only. */
+export const visibilityKeys = ["public","users","private"] as const;
+export type Visibility = typeof visibilityKeys[number];
 export type Section = typeof sectionKeys[number];
 export type Kind = "post" | "photo" | "suggestion";
 export type Status = "pending" | "approved" | "rejected";
 export type Member = {
   id: string; name_en: string | null; name_ckb: string | null;
   gender: "male" | "female" | "other" | "unspecified";
-  birth_year: number | null; death_year: number | null; photo_path: string | null;
+  birth_year: number | null; death_year: number | null; photo_path: string | null; visibility?: Visibility;
 };
 export type Parent = { child_id: string; parent_id: string };
 export type Partner = { first_id: string; second_id: string };

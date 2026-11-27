@@ -1,10 +1,10 @@
 import { backendReady, database } from "@/lib/supabase";
-import { hasAnyRole, parseAbout, parseRoles, type About, type Category, type Kind, type Member, type Parent, type Partner, type Roles, type Status } from "@/lib/model";
+import { hasAnyRole, parseAbout, parseRoles, type About, type Category, type Kind, type Member, type Parent, type Partner, type Roles, type Status, type Visibility } from "@/lib/model";
 
 export type AdminEntry = {
   id: string; kind: Kind; status: Status; title: string; body: string; category: Category | null;
   image_path: string | null; member_id: string | null; created_at: string; reviewed_at: string | null;
-  applied_at: string | null; author_email: string | null;
+  applied_at: string | null; author_email: string | null; visibility: Visibility;
 };
 export type AdminUser = {
   id: string; email: string | null; provider: string; created_at: string; last_sign_in_at: string | null;

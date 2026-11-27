@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { backendReady, database } from "@/lib/supabase";
 import { removePhotos, uploadPhoto } from "@/lib/photos";
-import { categoryKeys, sectionKeys, type Section } from "@/lib/model";
+import { categoryKeys, sectionKeys, visibilityKeys, type Section } from "@/lib/model";
 
 type Result = { error?: string; success?: string };
 const genders = ["male", "female", "other", "unspecified"];
@@ -15,6 +15,10 @@ const id = (form: FormData, key = "id") => {
   return uuid.test(value) ? value : null;
 };
 const fail = (code: string): Result => ({ error: code });
+const visibility = (form: FormData) => {
+  const value = text(form, "visibility");
+  return visibilityKeys.includes(value as never) ? value : null;
+};
 const ok = (code: string): Result => {
   revalidatePath("/");
   revalidatePath("/admin");
@@ -62,6 +66,7 @@ export async function saveMember(form: FormData): Promise<Result> {
     target: id(form), english_name: english || null, sorani_name: sorani || null,
     member_gender: gender, born, died, photo: path,
     parent_ids: related("parents"), partner_ids: related("partners"), source_suggestion: id(form, "suggestion"),
+    member_visibility: visibility(form),
   });
   if (error) {
     await removePhotos(ctx.db, [path]);
@@ -112,7 +117,7 @@ export async function publishEntry(form: FormData): Promise<Result> {
   }
   const { error } = await ctx.db.rpc("publish_contribution", {
     entry_kind: kind, entry_title: title, entry_body: body,
-    entry_category: kind === "post" ? category : null, entry_image: path,
+    entry_category: kind === "post" ? category : null, entry_image: path, entry_visibility: visibility(form) ?? "public",
   });
   if (error) {
     await removePhotos(ctx.db, [path]);
@@ -137,7 +142,7 @@ export async function updateEntry(form: FormData): Promise<Result> {
     return fail("invalid");
   }
   const { data, error } = await ctx.db.rpc("update_contribution", {
-    target, entry_title: title, entry_body: body, entry_category: category || null,
+    target, entry_title: title, entry_body: body, entry_category: category || null, entry_visibility: visibility(form),
   });
   if (error) return failure(error, error.code === "23514" ? "invalid" : "saveFailed");
   return data ? ok("entrySaved") : fail("notFound");

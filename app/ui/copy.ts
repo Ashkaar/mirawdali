@@ -230,3 +230,22 @@ Object.assign(production.ckb, {
   statPhotos:"وێنە بارکراون بۆ گالەری", statPhotosOne:"وێنە بارکراوە بۆ گالەری",
   statStories:"چیرۆک هاوبەشکراون لە بلۆگ", statStoriesOne:"چیرۆک هاوبەشکراوە لە بلۆگ",
 });
+
+Object.assign(production.en, {
+  whoCanSee:"Who can see this",
+  vis_public:"Everyone", vis_users:"Signed-in users only", vis_private:"Only me",
+  vis_public_short:"Public", vis_users_short:"Signed-in only", vis_private_short:"Only me",
+  vis_public_hint:"Visible to every visitor (unless the whole archive is set to signed-in users in Settings).",
+  vis_users_hint:"Visible only to people signed in with an account.",
+  vis_private_hint:"Visible only to you, the owner. Section admins can't see it either.",
+  visibilityHint:"Choose who can browse the archive as a whole. Each family member, photo and story also has its own “Who can see this” setting.",
+});
+Object.assign(production.ckb, {
+  whoCanSee:"کێ دەتوانێت ئەمە ببینێت",
+  vis_public:"هەموو کەس", vis_users:"تەنها ئەوانەی چوونەتە ژوورەوە", vis_private:"تەنها خۆم",
+  vis_public_short:"گشتی", vis_users_short:"تەنها بە هەژمار", vis_private_short:"تەنها خۆم",
+  vis_public_hint:"بۆ هەموو سەردانکەرێک دیارە (مەگەر هەموو ئەرشیفەکە لە ڕێکخستنەکاندا تەنها بۆ خاوەن هەژمار دانرابێت).",
+  vis_users_hint:"تەنها بۆ ئەوانە دیارە کە بە هەژمار چوونەتە ژوورەوە.",
+  vis_private_hint:"تەنها بۆ تۆ، خاوەن، دیارە. بەڕێوەبەرانی بەشەکانیش نایبینن.",
+  visibilityHint:"دیاری بکە کێ دەتوانێت هەموو ئەرشیفەکە ببینێت. هەر ئەندام و وێنە و چیرۆکێکیش ڕێکخستنی «کێ دەتوانێت ببینێت»ی خۆی هەیە.",
+});
